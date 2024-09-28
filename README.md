@@ -2,9 +2,9 @@
 
 ## Contributors
 
-Sahib Kullar (kullar@calpoly.edu)
-Sue Sue (susue@calpoly.edu)
-Carson Olander ()
-
+- Sahib Kullar (kullar@calpoly.edu)
+- Sue Sue (susue@calpoly.edu)
+- Carson Olander ()
+- 
 
 ## Project Description
