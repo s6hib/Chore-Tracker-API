@@ -5,7 +5,7 @@
 - Sahib Kullar (kullar@calpoly.edu)
 - Sue Sue (susue@calpoly.edu)
 - Carson Olander (cjolande@calpoly.edu)
-- (atartako@calpoly.edu)
+- Antony Tartakovskiy (atartako@calpoly.edu)
 
 ## Project Description
 
