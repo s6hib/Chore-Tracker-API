@@ -1,6 +1,5 @@
-# User Stories and Exceptions
+# User Stories
 
-### Create
 
 - As a roommate, I want to be able to add chores to the chore list to keep track of what needs to be done around the house/apartment.
 - As a roommate, I want to be able to remove chores from the chore list to update the chore list when chores have been completed.
