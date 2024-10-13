@@ -4,7 +4,8 @@
 
 ### Create a Chore
 
-**Endpoint:** `POST /chores`  
+**Endpoint:** `POST /chores` 
+
 **Request Body:**
 
 - `title`: string
