@@ -1,6 +1,5 @@
 # API Specification
 
----
 
 ### Create a Chore
 
