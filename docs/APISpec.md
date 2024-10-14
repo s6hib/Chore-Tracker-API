@@ -13,8 +13,10 @@
 - `due_date`: string
 - `assignee_id`: integer
 
-**Response:**  
-Creates a new chore in the database.
+**Response:**
+
+- `chore_id`: integer
+- `message`: string
 
 ---
 
@@ -27,8 +29,17 @@ Creates a new chore in the database.
 - `assignee`: string or integer
 - `priority`: integer
 
-**Response:**  
-Returns a list of chores with the specified filters.
+**Response:**
+
+- `chores`: array of objects
+  - `id`: integer
+  - `title`: string
+  - `description`: string
+  - `priority`: integer
+  - `duration`: integer
+  - `due_date`: string
+  - `status`: string
+  - `assignee_id`: integer
 
 ---
 
@@ -39,8 +50,19 @@ Returns a list of chores with the specified filters.
 
 - `id`: integer
 
-**Response:**  
-Returns the details of a specific chore, including associated comments.
+**Response:**
+
+- `id`: integer
+- `title`: string
+- `description`: string
+- `priority`: integer
+- `duration`: integer
+- `due_date`: string
+- `status`: string
+- `assignee_id`: integer
+- `comments`: array of objects
+  - `comment_text`: string
+  - `commenter_id`: integer
 
 ---
 
@@ -57,8 +79,10 @@ Returns the details of a specific chore, including associated comments.
 - `priority`: integer
 - `status`: string
 
-**Response:**  
-Updates the specified chore in the database.
+**Response:**
+
+- `message`: string
+- `updated_fields`: array of strings
 
 ---
 
@@ -69,8 +93,10 @@ Updates the specified chore in the database.
 
 - `id`: integer
 
-**Response:**  
-Confirms the deletion of the specified chore.
+**Response:**
+
+- `message`: string
+- `deleted_chore_id`: integer
 
 ---
 
@@ -86,8 +112,10 @@ Confirms the deletion of the specified chore.
 - `comment_text`: string
 - `commenter_id`: integer
 
-**Response:**  
-Adds a comment to the specific chore.
+**Response:**
+
+- `comment_id`: integer
+- `message`: string
 
 ---
 
@@ -100,8 +128,10 @@ Adds a comment to the specific chore.
 - `last_name`: string
 - `chores`: array of integers
 
-**Response:**  
-Creates a new roommate in the database with a unique ID.
+**Response:**
+
+- `roommate_id`: integer
+- `message`: string
 
 ---
 
@@ -116,8 +146,10 @@ Creates a new roommate in the database with a unique ID.
 
 - `chore_id`: integer
 
-**Response:**  
-Adds the chore(s) from the chore list to a specific roommate's list of chores they are responsible for completing.
+**Response:**
+
+- `message`: string
+- `assigned_chore_id`: integer
 
 ---
 
@@ -129,8 +161,13 @@ Adds the chore(s) from the chore list to a specific roommate's list of chores th
 - `first_name`: string
 - `last_name`: string
 
-**Response:**  
-Returns a list of all roommates with the specified filters.
+**Response:**
+
+- `roommates`: array of objects
+  - `id`: integer
+  - `first_name`: string
+  - `last_name`: string
+  - `chores`: array of integers
 
 ---
 
@@ -141,8 +178,16 @@ Returns a list of all roommates with the specified filters.
 
 - `id`: integer
 
-**Response:**  
-Returns the list of chores assigned to the specific roommate.
+**Response:**
+
+- `chores`: array of objects
+  - `id`: integer
+  - `title`: string
+  - `description`: string
+  - `priority`: integer
+  - `duration`: integer
+  - `due_date`: string
+  - `status`: string
 
 ---
 
@@ -155,5 +200,7 @@ Returns the list of chores assigned to the specific roommate.
 - `roommate_ids`: array of integers
 - `due_date`: string
 
-**Response:**  
-Creates a bill for the specified roommates and stores it in the database.
+**Response:**
+
+- `bill_id`: integer
+- `message`: string
