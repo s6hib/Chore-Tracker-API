@@ -1,7 +1,7 @@
 # API Specification
 
 
-### Create a Chore
+### 1. Create a Chore
 
 **Endpoint:** `POST /chores`
 
@@ -36,7 +36,7 @@
 
 ---
 
-### Get All Chores
+### 2. Get All Chores
 
 **Endpoint:** `GET /chores`
 
