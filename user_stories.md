@@ -1,18 +1,18 @@
 # User Stories
 
 
-- As a roommate, I want to be able to add chores to the chore list to keep track of what needs to be done around the house/apartment.
-- As a roommate, I want to be able to remove chores from the chore list to update the chore list when chores have been completed.
-- As a roommate, I want to be able to assign specific chores to a roommate to spread the chores evenly amongst roommates.
-- As a roommate, I want to be able to find out how much time each chore takes to complete in order to know how to evenly distribute the workload of the chores that need to be done.
-- As a roommate, I want to find out what chores have the highest priority of being done first so we know what chores to focus on first.
-- As a roommate, I want to set a due date for each chore, so that I can prioritize tasks that need to be completed soon.
-- As a roommate, I want to add comments or notes to a chore, so that I can provide additional context or instructions for the task.
-- As a roommate, I want to view the entire chore list, so that I can see all the tasks that need to be done.
-- As a roommate, I want to create the bill, so that we can evenly distribute expenses among us.
-- As a roommate, I want to mark chores as completed so that everyone knows which tasks have already been done.
-- As a roommate, I want to receive reminders for the upcoming or overdue chores so that we don’t forget to complete important tasks.
-- As a roommate, I want to search for chores that are assigned to me so that I can quickly find and focus on my responsibilities.
+- As a roommate who likes staying organized, I want to be able to add chores to the chore list so that I can keep track of what needs to be done around the house/apartment.
+- As a roommate who wants to avoid clutter, I want to be able to remove chores from the chore list to update the chore list when chores have been completed.
+- As a roommate who values fairness in the house, I want to be able to assign specific chores to each roommate to make sure everyone contributes and the workload is evenly distributed.
+- As a roommate with a busy schedule, I want to be able to find out how much time each chore takes to complete in order to know how to evenly distribute the workload of the chores that need to be done for my time management.
+- As a roommate who prefers structure, I want to identify which chores have the highest priority so we know which ones to tackle first, avoiding procrastination on urgent tasks.
+- As a roommate who manages deadlines effectively, I want to set due dates for chores so that I can prioritize and complete tasks that are approaching their deadlines.
+- As a roommate who wants to ensure tasks are done correctly, I want to add comments or notes to a chore so I can provide additional instructions or context.
+- As a roommate who needs a clear overview, I want to view the entire chore list so that I can see all pending tasks and plan my day accordingly.
+- As a roommate who tracks shared expenses, I want to be able to create a bill to evenly distribute the costs among us, ensuring fairness in our financial contributions.
+- As a roommate who likes visual feedback, I want to mark chores as completed so that everyone knows which tasks have already been done, keeping things transparent.
+- As a roommate who sometimes forgets tasks, I want to receive reminders for upcoming or overdue chores so I don’t miss out on completing important tasks.
+- As a roommate who wants to stay on top of my responsibilities, I want to search for chores that are assigned to me so that I can quickly find and focus on my responsibilities.
 
 # User Exceptions
 
