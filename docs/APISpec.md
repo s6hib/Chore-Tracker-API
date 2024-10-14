@@ -77,7 +77,7 @@ If no query parameters are provided, all chores will be returned.
       The estimated duration of the chore, expressed in minutes.
       
     - `due_date`: string  
-      The due date of the chore (in ISO 8601 format, YYYY-MM-DD).
+      The due date of the chore (YYYY-MM-DD).
       
     - `status`: string  
       The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
