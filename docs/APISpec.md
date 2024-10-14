@@ -1,6 +1,5 @@
 # API Specification
 
-
 ### 1. Create a Chore
 
 **Endpoint:** `POST /chores`
@@ -9,19 +8,19 @@
 
 - `title`: string  
   The name of the chore.
-  
+
 - `description`: string  
   A detailed description of the chore.
-  
+
 - `priority`: integer (1–5)  
   The priority level of the chore, where `1` is the lowest and `5` is the highest.
-  
+
 - `duration`: integer (minutes)  
   The estimated time required to complete the chore, expressed in minutes.
-  
+
 - `due_date`: string (YYYY-MM-DD)  
   The due date by which the chore should be completed.
-  
+
 - `assignee_id`: integer  
   The ID of the roommate assigned to this chore.
 
@@ -29,10 +28,9 @@
 
 - `chore_id`: integer  
   The ID of the created chore.
-  
+
 - `message`: string  
   A confirmation message.
-
 
 ---
 
@@ -60,145 +58,198 @@ If no query parameters are provided, all chores will be returned.
 
 - `chores`: array of objects  
   A list of chores that match the provided filters (if any).
+  - `id`: integer  
+    The unique identifier for the chore.
 
-    - `id`: integer  
-      The unique identifier for the chore.
-      
-    - `title`: string  
-      The title of the chore.
-      
-    - `description`: string  
-      A detailed description of the chore.
-      
-    - `priority`: integer  
-      The priority level of the chore (1–5).
-      
-    - `duration`: integer  
-      The estimated duration of the chore, expressed in minutes.
-      
-    - `due_date`: string  
-      The due date of the chore (YYYY-MM-DD).
-      
-    - `status`: string  
-      The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
-      
-    - `assignee_id`: integer  
-      The ID of the roommate assigned to the chore.
+  - `title`: string  
+    The title of the chore.
 
+  - `description`: string  
+    A detailed description of the chore.
+
+  - `priority`: integer  
+    The priority level of the chore (1–5).
+
+  - `duration`: integer  
+    The estimated duration of the chore, expressed in minutes.
+
+  - `due_date`: string  
+    The due date of the chore (YYYY-MM-DD).
+
+  - `status`: string  
+    The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
+
+  - `assignee_id`: integer  
+    The ID of the roommate assigned to the chore.
 
 ---
 
-### Get Specific Chore
+### 3. Get Specific Chore
 
-**Endpoint:** `GET /chores/{id}`  
-**Request Parameters:**
+**Endpoint:** `GET /chores/{id}`
 
-- `id`: integer
+**Request Path Parameter:**
+
+- `id`: integer  
+  The unique identifier of the chore to be retrieved.
 
 **Response:**
 
-- `id`: integer
-- `title`: string
-- `description`: string
-- `priority`: integer
-- `duration`: integer
-- `due_date`: string
-- `status`: string
-- `assignee_id`: integer
-- `comments`: array of objects
-  - `comment_text`: string
-  - `commenter_id`: integer
+- `id`: integer  
+  The unique identifier for the chore.
+- `title`: string  
+  The title of the chore.
+- `description`: string  
+  A detailed description of the chore.
+- `priority`: integer  
+  The priority level of the chore (1–5).
+- `duration`: integer  
+  The estimated time required to complete the chore, expressed in minutes.
+- `due_date`: string  
+  The due date by which the chore should be completed (YYYY-MM-DD).
+- `status`: string  
+  The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
+- `assignee_id`: integer  
+  The ID of the roommate assigned to the chore.
+- `comments`: array of objects  
+  A list of comments associated with the chore.
+  - `comment_text`: string  
+    The text of the comment.
+  - `commenter_id`: integer  
+    The ID of the roommate who made the comment.
 
 ---
 
-### Update a Chore
+### 4. Update a Chore
 
-**Endpoint:** `PUT /chores/{id}`  
-**Request Parameters:**
+**Endpoint:** `PUT /chores/{id}`
 
-- `id`: integer
+**Request Path Parameter:**
+
+- `id`: integer  
+  The unique identifier of the chore to be updated.
 
 **Request Body:**
 
-- `title`: string
-- `priority`: integer
-- `status`: string
+The request body supports partial updates. You may include one or more of the following fields to update only specific attributes of the chore:
+
+- `title`: string  
+  The name of the chore.
+- `description`: string  
+  A detailed description of the chore.
+- `priority`: integer (1–5)  
+  The priority level of the chore, where `1` is the lowest and `5` is the highest.
+- `duration`: integer (minutes)  
+  The estimated time required to complete the chore, expressed in minutes.
+- `due_date`: string (YYYY-MM-DD)  
+  The due date by which the chore should be completed.
+- `status`: string  
+  The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
 
 **Response:**
 
-- `message`: string
-- `updated_fields`: array of strings
+- `message`: string  
+  A confirmation message indicating the result of the update.
+- `updated_fields`: array of strings  
+  A list of the fields that were updated.
 
 ---
 
-### Delete a Chore
+### 5. Delete a Chore
 
-**Endpoint:** `DELETE /chores/{id}`  
-**Request Parameters:**
+**Endpoint:** `DELETE /chores/{id}`
 
-- `id`: integer
+**Request Path Parameter:**
+
+- `id`: integer  
+  The unique identifier of the chore to be deleted.
 
 **Response:**
 
-- `message`: string
-- `deleted_chore_id`: integer
+- `message`: string  
+  A confirmation message indicating whether the chore was successfully deleted.
+- `deleted_chore_id`: integer  
+  The unique identifier of the deleted chore.
 
 ---
 
-### Add Comment to Chore
+### 6. Add Comment to Chore
 
-**Endpoint:** `POST /chores/{id}/comments`  
-**Request Parameters:**
+**Endpoint:** `POST /chores/{id}/comments`
 
-- `id`: integer
+**Request Path Parameter:**
+
+- `id`: integer  
+  The unique identifier of the chore to which the comment will be added.
 
 **Request Body:**
 
-- `comment_text`: string
-- `commenter_id`: integer
+- `comment_text`: string  
+  The text of the comment to be added to the chore.
+- `commenter_id`: integer  
+  The ID of the roommate (same as `roommate_id`) who is adding the comment.
 
 **Response:**
 
-- `comment_id`: integer
-- `message`: string
+- `comment_id`: integer  
+  The unique identifier of the created comment.
+- `message`: string  
+  A confirmation message indicating that the comment was successfully added.
+- `timestamp`: string (YYYY-MM-DD)  
+  The timestamp indicating when the comment was created.
 
 ---
 
-### Create a Roommate
+### 7. Create a Roommate
 
-**Endpoint:** `POST /roommates`  
-**Request Body:**
-
-- `first_name`: string
-- `last_name`: string
-- `chores`: array of integers
-
-**Response:**
-
-- `roommate_id`: integer
-- `message`: string
-
----
-
-### Assign Chore to Roommate
-
-**Endpoint:** `POST /roommates/{id}/chores`  
-**Request Parameters:**
-
-- `id`: integer
+**Endpoint:** `POST /roommates`
 
 **Request Body:**
 
-- `chore_id`: integer
+- `first_name`: string  
+  The first name of the roommate to be created.
+- `last_name`: string  
+  The last name of the roommate to be created.
+- `chores`: array of integers (optional)  
+  A list of chore IDs that this roommate is responsible for. If this array is empty or not provided, the roommate will initially have no assigned chores.
+
+  **Note:** If chores are assigned during roommate creation, the API will verify the validity of each chore ID. If any chore ID is invalid or already assigned to another roommate, an error will be returned.
 
 **Response:**
 
-- `message`: string
-- `assigned_chore_id`: integer
+- `roommate_id`: integer  
+  The unique identifier of the created roommate.
+- `message`: string  
+  A confirmation message indicating that the roommate was successfully created.
 
 ---
 
-### Get All Roommates
+### 8. Assign Chore to Roommate
+
+**Endpoint:** `POST /roommates/{id}/chores`
+
+**Request Path Parameter:**
+
+- `id`: integer  
+  The unique identifier of the roommate to whom the chore will be assigned.
+
+**Request Body:**
+
+- `chore_id`: integer  
+  The unique identifier of the chore to be assigned to the roommate.
+
+  **Note:** The API will verify that the chore ID is valid and not already assigned to another roommate. If the chore is invalid or already assigned, an error will be returned.
+
+**Response:**
+
+- `message`: string  
+  A confirmation message indicating the result of the assignment.
+- `assigned_chore_id`: integer  
+  The unique identifier of the assigned chore.
+
+---
+
+### 9. Get All Roommates
 
 **Endpoint:** `GET /roommates`  
 **Request Query Parameters:**
@@ -216,7 +267,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### Get Chores by Roommate
+### 10. Get Chores by Roommate
 
 **Endpoint:** `GET /roommates/{id}/chores`  
 **Request Parameters:**
@@ -236,7 +287,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### Create a Bill
+### 11. Create a Bill
 
 **Endpoint:** `POST /bills`  
 **Request Body:**
