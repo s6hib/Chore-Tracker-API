@@ -3,20 +3,36 @@
 
 ### Create a Chore
 
-**Endpoint:** `POST /chores`  
+**Endpoint:** POST /chores
+
 **Request Body:**
 
-- `title`: string
-- `description`: string
-- `priority`: integer
-- `duration`: integer
-- `due_date`: string
-- `assignee_id`: integer
+- `title`: string  
+  The name of the chore.
+  
+- `description`: string  
+  A detailed description of the chore.
+  
+- `priority`: integer (1–5)  
+  The priority level of the chore, where `1` is the lowest and `5` is the highest.
+  
+- `duration`: integer (minutes)  
+  The estimated time required to complete the chore, expressed in minutes.
+  
+- `due_date`: string (YYYY-MM-DD)  
+  The due date by which the chore should be completed.
+  
+- `assignee_id`: integer  
+  The ID of the roommate assigned to this chore.
 
 **Response:**
 
-- `chore_id`: integer
-- `message`: string
+- `chore_id`: integer  
+  The ID of the created chore.
+  
+- `message`: string  
+  A confirmation message.
+
 
 ---
 
