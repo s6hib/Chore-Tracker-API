@@ -38,24 +38,53 @@
 
 ### Get All Chores
 
-**Endpoint:** `GET /chores`  
+**Endpoint:** `GET /chores`
+
 **Request Query Parameters:**
 
-- `status`: string
-- `assignee`: string or integer
-- `priority`: integer
+- `status`: string (optional)  
+  Filter chores based on their current status. Predefined values: `pending`, `in_progress`, `completed`. If not provided, chores of all statuses will be returned.
+
+- `assignee_name`: string (optional)  
+  Filter chores by the name of the assigned roommate. If provided, this will search based on the assignee's full name.
+
+- `assignee_id`: integer (optional)  
+  Filter chores by the `assignee_id` of the assigned roommate. If provided, this will search based on the ID of the assigned roommate.
+
+- `priority`: integer (optional)  
+  Filter chores based on their priority level. If not provided, chores of all priorities will be returned.
+
+If no query parameters are provided, all chores will be returned.
 
 **Response:**
 
-- `chores`: array of objects
-  - `id`: integer
-  - `title`: string
-  - `description`: string
-  - `priority`: integer
-  - `duration`: integer
-  - `due_date`: string
-  - `status`: string
-  - `assignee_id`: integer
+- `chores`: array of objects  
+  A list of chores that match the provided filters (if any).
+
+    - `id`: integer  
+      The unique identifier for the chore.
+      
+    - `title`: string  
+      The title of the chore.
+      
+    - `description`: string  
+      A detailed description of the chore.
+      
+    - `priority`: integer  
+      The priority level of the chore (1–5).
+      
+    - `duration`: integer  
+      The estimated duration of the chore, expressed in minutes.
+      
+    - `due_date`: string  
+      The due date of the chore (in ISO 8601 format, YYYY-MM-DD).
+      
+    - `status`: string  
+      The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
+      
+    - `assignee_id`: integer  
+      The ID of the roommate assigned to the chore.
+
 
 ---
 
