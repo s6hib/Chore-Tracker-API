@@ -251,19 +251,77 @@ The request body supports partial updates. You may include one or more of the fo
 
 ### 9. Get All Roommates
 
-**Endpoint:** `GET /roommates`  
+**Endpoint:** `GET /roommates`
+
 **Request Query Parameters:**
 
-- `first_name`: string
-- `last_name`: string
+- `first_name`: string (optional)  
+  The first name of the roommate to filter results. If not provided, all roommates will be returned.
+  
+- `last_name`: string (optional)  
+  The last name of the roommate to filter results. If not provided, all roommates will be returned.
 
 **Response:**
 
-- `roommates`: array of objects
-  - `id`: integer
-  - `first_name`: string
-  - `last_name`: string
-  - `chores`: array of integers
+- `roommates`: array of objects  
+  A list of roommates matching the filter criteria, or all roommates if no filters are provided.
+
+  - `id`: integer  
+    The unique identifier of the roommate.
+    
+  - `first_name`: string  
+    The first name of the roommate.
+    
+  - `last_name`: string  
+    The last name of the roommate.
+    
+  - `chores`: array of objects  
+    A list of chore objects assigned to the roommate.
+
+    - `id`: integer  
+      The unique identifier of the chore.
+      
+    - `name`: string  
+      The name or description of the chore.
+      
+    - `due_date`: string (ISO 8601 date format)  
+      The due date of the chore.### 9. Get All Roommates
+
+**Endpoint:** `GET /roommates`
+
+**Request Query Parameters:**
+
+- `first_name`: string (optional)  
+  The first name of the roommate to filter results. If not provided, all roommates will be returned.
+  
+- `last_name`: string (optional)  
+  The last name of the roommate to filter results. If not provided, all roommates will be returned.
+
+**Response:**
+
+- `roommates`: array of objects  
+  A list of roommates matching the filter criteria, or all roommates if no filters are provided.
+
+  - `id`: integer  
+    The unique identifier of the roommate.
+    
+  - `first_name`: string  
+    The first name of the roommate.
+    
+  - `last_name`: string  
+    The last name of the roommate.
+    
+  - `chores`: array of objects  
+    A list of chore objects assigned to the roommate.
+
+    - `id`: integer  
+      The unique identifier of the chore.
+      
+    - `name`: string  
+      The name or description of the chore.
+      
+    - `due_date`: string (YYYY-MM-DD)  
+      The due date of the chore.
 
 ---
 
