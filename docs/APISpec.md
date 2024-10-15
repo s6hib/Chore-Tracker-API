@@ -3,9 +3,10 @@
 ### 1. Create a Chore
 
 **Endpoint:** `POST /chores`
+
 **Description:** Creates a new chore and assigns it to a roommate with optional priority, description, and due date.
 
-**Request Body:**
+**Request:**
 
 - `title`: string  
   The name of the chore.
@@ -40,7 +41,7 @@
 **Endpoint:** `GET /chores`
 **Description:** Retrieves a list of all chores, with optional filters for status, priority, or assignee.
 
-**Request Query Parameters:**
+**Request:**
 
 - `status`: string (optional)  
   Filter chores based on their current status. Predefined values: `pending`, `in_progress`, `completed`. If not provided, chores of all statuses will be returned.
@@ -89,9 +90,10 @@ If no query parameters are provided, all chores will be returned.
 ### 3. Get Specific Chore
 
 **Endpoint:** `GET /chores/{id}`
+
 **Description:** Retrieves the details of a specific chore by its unique ID.
 
-**Request Path Parameter:**
+**Request:**
 
 - `id`: integer  
   The unique identifier of the chore to be retrieved.
@@ -126,9 +128,10 @@ If no query parameters are provided, all chores will be returned.
 ### 4. Update a Chore
 
 **Endpoint:** `PATCH /chores/{id}`
+
 **Description:** Updates specific fields of a chore. Supports partial updates.
 
-**Request Path Parameter:**
+**Request:**
 
 - `id`: integer  
   The unique identifier of the chore to be updated.
