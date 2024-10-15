@@ -316,7 +316,8 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Request (Path Parameter):**
 
-- `id`: integer 
+- `id`: integer
+  
   The unique identifier of the roommate whose chores are being retrieved.
 
 **Response:**
