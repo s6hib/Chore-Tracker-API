@@ -6,7 +6,7 @@
 
 **Description:** Creates a new chore and assigns it to a roommate with optional priority, description, and due date.
 
-**Request:**
+**Request Body:**
 
 - `title`: string  
   The name of the chore.
@@ -39,9 +39,10 @@
 ### 2. Get All Chores
 
 **Endpoint:** `GET /chores`
+
 **Description:** Retrieves a list of all chores, with optional filters for status, priority, or assignee.
 
-**Request:**
+**Request Query Parameters:**
 
 - `status`: string (optional)  
   Filter chores based on their current status. Predefined values: `pending`, `in_progress`, `completed`. If not provided, chores of all statuses will be returned.
@@ -93,7 +94,7 @@ If no query parameters are provided, all chores will be returned.
 
 **Description:** Retrieves the details of a specific chore by its unique ID.
 
-**Request:**
+**Request Path Parameter:**
 
 - `id`: integer  
   The unique identifier of the chore to be retrieved.
@@ -131,7 +132,7 @@ If no query parameters are provided, all chores will be returned.
 
 **Description:** Updates specific fields of a chore. Supports partial updates.
 
-**Request:**
+**Request Path Parameter:**
 
 - `id`: integer  
   The unique identifier of the chore to be updated.
@@ -165,6 +166,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 5. Delete a Chore
 
 **Endpoint:** `DELETE /chores/{id}`
+
 **Description:** Deletes a specific chore from the system.
 
 **Request Path Parameter:**
@@ -184,6 +186,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 6. Add Comment to Chore
 
 **Endpoint:** `POST /chores/{id}/comments`
+
 **Description:** Adds a comment to a specific chore.
 
 **Request Path Parameter:**
@@ -212,6 +215,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 7. Create a Roommate
 
 **Endpoint:** `POST /roommates`
+
 **Description:** Creates a new roommate in the system with optional assigned chores.
 
 **Request Body:**
@@ -237,6 +241,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 8. Assign Chore to Roommate
 
 **Endpoint:** `POST /roommates/{id}/assignments`
+
 **Description:** Assigns a specific chore to a roommate.
 
 **Request Path Parameter:**
@@ -263,6 +268,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 9. Get All Roommates
 
 **Endpoint:** `GET /roommates`
+
 **Description:** Retrieves a list of all roommates, with optional filters by name.
 
 **Request Query Parameters:**
@@ -304,6 +310,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 10. Get Chores by Roommate
 
 **Endpoint:** `GET /roommates/{id}/chores`
+
 **Description:** Retrieves all chores assigned to a specific roommate.
 
 **Request Path Parameters:**
@@ -342,6 +349,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 11. Create a Bill
 
 **Endpoint:** `POST /bills`
+
 **Description:** Creates a new bill and assigns it to the responsible roommates.
 
 **Request Path Parameters:**
@@ -367,7 +375,8 @@ The request body supports partial updates. You may include one or more of the fo
 
 ### 12. Get a Bill 
 
-**Endpoint:** GET /bills
+**Endpoint:** `GET /bills`
+
 **Description:** Retrieves all bills, with an optional filter by status.
 
 **Request Path Parameters:**
@@ -406,7 +415,8 @@ The request body supports partial updates. You may include one or more of the fo
   
 ### 13. Update a Bill 
 
-**Endpoint:** PATCH /bills/{bill_id}
+**Endpoint:** `PATCH /bills/{bill_id}`
+
 **Description:** Updates the due date or description of a bill.
 
 **Request Path Parameters:**
