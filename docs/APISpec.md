@@ -374,64 +374,58 @@ The request body supports partial updates. You may include one or more of the fo
 
 ---
 
-### 12. Get a Bill 
+12. Get a Bill
+Endpoint: GET /bills
 
-**Endpoint:** `GET /bills`
+Description: Retrieves all bills, with an optional filter by status.
 
-**Description:** Retrieves all bills, with an optional filter by status.
+Request:
 
-**Request:**
+status: string (optional)
+Filter bills by their status. Possible values are "paid" or "unpaid".
+Response:
 
-- `status`: string (optional)
-  Filter bills by their status. Possible values are "paid" or "unpaid".
+bill_id: integer
+The unique identifier of the bill.
 
-**Response:**
+description: string
+A brief description of the bill (e.g., "Electricity bill").
 
-- `bill_id`: integer
-  The unique identifier of the bill
-  
-- `description`: string
-  A brief description of the bill (e.g., "Electricity bill").
+total_amount: float
+The total amount of the bill.
 
-- `total_amount`: float
-  The total amount of the bill.
+due_date: string (YYYY-MM-DD)
+The due date for the bill payment.
 
-- `due_date`: string (YYYY-MM-DD)
-  The due date for the bill payment.
+status: string
+The current payment status of the bill (e.g., "paid" or "unpaid").
 
-- `status`: string
-  The current payment status of the bill (e.g., "paid" or "unpaid").
+roommates: array of objects
+A list of roommates and their respective payment statuses.
 
-- `roommates`: array of objects
-  A list of roommates and their respective payment statuses.
-    - `roommate_id `: integer
-      The unique identifier of the roommate.
-      
-    - `amount_due`: float
-      The amount the roommate is responsible for.
-      
-    - `status`: string
-      The unique identifier of the roommate.
-      
-    - `roommate_id `: integer
-      The payment status for the roommate (e.g., "paid", "unpaid").
----
-  
-### 13. Update a Bill 
+roommate_id: integer
+The unique identifier of the roommate.
 
-**Endpoint:** `PATCH /bills/{bill_id}`
+amount_due: float
+The amount the roommate is responsible for.
 
-**Description:** Updates the due date or description of a bill.
+status: string
+The payment status for the roommate (e.g., "paid", "unpaid").
 
-**Request:**
+13. Update a Bill
+Endpoint: PATCH /bills/{bill_id}
 
-- `due_date`: string (YYYY-MM-DD)(optional)
-  The new due date for the bill
-  
-- `description`: string (optional)
-  An updated description of the bill.
+Description: Updates the due date or description of a bill.
 
-**Response:**
+Request:
 
-- `message`: string
-  A confirmation message indicating the successful update of the bill
+due_date: string (YYYY-MM-DD) (optional)
+The new due date for the bill.
+
+description: string (optional)
+An updated description of the bill.
+
+Response:
+
+message: string
+A confirmation message indicating the successful update of the bill.
