@@ -226,7 +226,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 ### 8. Assign Chore to Roommate
 
-**Endpoint:** `POST /roommates/{id}/chores`
+**Endpoint:** `POST /roommates/{id}/assignments`
 
 **Request Path Parameter:**
 
