@@ -6,7 +6,7 @@
 
 **Description:** Creates a new chore and assigns it to a roommate with optional priority, description, and due date.
 
-**Request Body:**
+**Request:**
 
 - `title`: string  
   The name of the chore.
@@ -42,7 +42,7 @@
 
 **Description:** Retrieves a list of all chores, with optional filters for status, priority, or assignee.
 
-**Request Query Parameters:**
+**Request:**
 
 - `status`: string (optional)  
   Filter chores based on their current status. Predefined values: `pending`, `in_progress`, `completed`. If not provided, chores of all statuses will be returned.
@@ -53,7 +53,7 @@
 - `assignee_id`: integer (optional)  
   Filter chores by the `assignee_id` of the assigned roommate. If provided, this will search based on the ID of the assigned roommate.
 
-- `priority`: integer (optional)  
+- `priority`: integer (1–5) (optional)  
   Filter chores based on their priority level. If not provided, chores of all priorities will be returned.
 
 If no query parameters are provided, all chores will be returned.
@@ -94,7 +94,7 @@ If no query parameters are provided, all chores will be returned.
 
 **Description:** Retrieves the details of a specific chore by its unique ID.
 
-**Request Path Parameter:**
+**Request:**
 
 - `id`: integer  
   The unique identifier of the chore to be retrieved.
@@ -132,7 +132,7 @@ If no query parameters are provided, all chores will be returned.
 
 **Description:** Updates specific fields of a chore. Supports partial updates.
 
-**Request Path Parameter:**
+**Request:**
 
 - `id`: integer  
   The unique identifier of the chore to be updated.
@@ -169,13 +169,14 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Deletes a specific chore from the system.
 
-**Request Path Parameter:**
+**Request:**
 
 - `id`: integer  
   The unique identifier of the chore to be deleted.
 
 **Response:**
 
+- `success`: boolean
 - `message`: string  
   A confirmation message indicating whether the chore was successfully deleted.
 - `deleted_chore_id`: integer  
@@ -189,7 +190,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Adds a comment to a specific chore.
 
-**Request Path Parameter:**
+**Request:**
 
 - `id`: integer  
   The unique identifier of the chore to which the comment will be added.
@@ -218,7 +219,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Creates a new roommate in the system with optional assigned chores.
 
-**Request Body:**
+**Request:**
 
 - `first_name`: string  
   The first name of the roommate to be created.
@@ -244,7 +245,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Assigns a specific chore to a roommate.
 
-**Request Path Parameter:**
+**Request:**
 
 - `id`: integer  
   The unique identifier of the roommate to whom the chore will be assigned.
@@ -271,7 +272,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Retrieves a list of all roommates, with optional filters by name.
 
-**Request Query Parameters:**
+**Request:**
 
 - `first_name`: string (optional)  
   The first name of the roommate to filter results. If not provided, all roommates will be returned.
@@ -313,7 +314,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Retrieves all chores assigned to a specific roommate.
 
-**Request Path Parameters:**
+**Request:**
 
 - `id`: integer 
   The unique identifier of the roommate whose chores are being retrieved.
@@ -352,7 +353,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Creates a new bill and assigns it to the responsible roommates.
 
-**Request Path Parameters:**
+**Request:**
 
 - `total_amount`: float  
   The total amount of the bill.
@@ -379,7 +380,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Retrieves all bills, with an optional filter by status.
 
-**Request Path Parameters:**
+**Request:**
 
 - `status`: string (optional)
   Filter bills by their status. Possible values are "paid" or "unpaid".
@@ -419,7 +420,7 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Description:** Updates the due date or description of a bill.
 
-**Request Path Parameters:**
+**Request:**
 
 - `due_date`: string (YYYY-MM-DD)(optional)
   The new due date for the bill
