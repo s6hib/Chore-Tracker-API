@@ -3,25 +3,26 @@
 ### 1. Create a Chore
 
 **Endpoint:** `POST /chores`
+**Description:** Creates a new chore and assigns it to a roommate with optional priority, description, and due date.
 
 **Request Body:**
 
 - `title`: string  
   The name of the chore.
 
-- `description`: string  
+- `description`: string (optional)
   A detailed description of the chore.
 
-- `priority`: integer (1–5)  
+- `priority`: integer (1–5) (optional) 
   The priority level of the chore, where `1` is the lowest and `5` is the highest.
 
-- `duration`: integer (minutes)  
+- `duration`: integer (minutes) (optional)
   The estimated time required to complete the chore, expressed in minutes.
 
-- `due_date`: string (YYYY-MM-DD)  
+- `due_date`: string (YYYY-MM-DD)  (optional)
   The due date by which the chore should be completed.
 
-- `assignee_id`: integer  
+- `assignee_id`: integer (optional) 
   The ID of the roommate assigned to this chore.
 
 **Response:**
@@ -37,6 +38,7 @@
 ### 2. Get All Chores
 
 **Endpoint:** `GET /chores`
+**Description:** Retrieves a list of all chores, with optional filters for status, priority, or assignee.
 
 **Request Query Parameters:**
 
@@ -87,6 +89,7 @@ If no query parameters are provided, all chores will be returned.
 ### 3. Get Specific Chore
 
 **Endpoint:** `GET /chores/{id}`
+**Description:** Retrieves the details of a specific chore by its unique ID.
 
 **Request Path Parameter:**
 
@@ -123,6 +126,7 @@ If no query parameters are provided, all chores will be returned.
 ### 4. Update a Chore
 
 **Endpoint:** `PATCH /chores/{id}`
+**Description:** Updates specific fields of a chore. Supports partial updates.
 
 **Request Path Parameter:**
 
@@ -158,6 +162,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 5. Delete a Chore
 
 **Endpoint:** `DELETE /chores/{id}`
+**Description:** Deletes a specific chore from the system.
 
 **Request Path Parameter:**
 
@@ -176,6 +181,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 6. Add Comment to Chore
 
 **Endpoint:** `POST /chores/{id}/comments`
+**Description:** Adds a comment to a specific chore.
 
 **Request Path Parameter:**
 
@@ -203,6 +209,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 7. Create a Roommate
 
 **Endpoint:** `POST /roommates`
+**Description:** Creates a new roommate in the system with optional assigned chores.
 
 **Request Body:**
 
@@ -227,6 +234,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 8. Assign Chore to Roommate
 
 **Endpoint:** `POST /roommates/{id}/assignments`
+**Description:** Assigns a specific chore to a roommate.
 
 **Request Path Parameter:**
 
@@ -252,6 +260,7 @@ The request body supports partial updates. You may include one or more of the fo
 ### 9. Get All Roommates
 
 **Endpoint:** `GET /roommates`
+**Description:** Retrieves a list of all roommates, with optional filters by name.
 
 **Request Query Parameters:**
 
@@ -292,10 +301,11 @@ The request body supports partial updates. You may include one or more of the fo
 ### 10. Get Chores by Roommate
 
 **Endpoint:** `GET /roommates/{id}/chores`
+**Description:** Retrieves all chores assigned to a specific roommate.
 
 **Request Path Parameters:**
 
-- `id`: integer (required)  
+- `id`: integer 
   The unique identifier of the roommate whose chores are being retrieved.
 
 **Response:**
@@ -329,16 +339,17 @@ The request body supports partial updates. You may include one or more of the fo
 ### 11. Create a Bill
 
 **Endpoint:** `POST /bills`
+**Description:** Creates a new bill and assigns it to the responsible roommates.
 
-**Request Body:**
+**Request Path Parameters:**
 
-- `total_amount`: float (required)  
+- `total_amount`: float  
   The total amount of the bill.
 
-- `roommate_ids`: array of integers (required)  
+- `roommate_ids`: array of integers  
   A list of unique identifiers of the roommates responsible for paying the bill.
 
-- `due_date`: string (YYYY-MM-DD) (required)  
+- `due_date`: string (YYYY-MM-DD)  
   The date by which the bill must be paid.
 
 **Response:**
@@ -354,8 +365,9 @@ The request body supports partial updates. You may include one or more of the fo
 ### 12. Get a Bill 
 
 **Endpoint:** GET /bills
+**Description:** Retrieves all bills, with an optional filter by status.
 
-**Request Body:**
+**Request Path Parameters:**
 
 - `status`: string (optional)
   Filter bills by their status. Possible values are "paid" or "unpaid".
@@ -392,8 +404,9 @@ The request body supports partial updates. You may include one or more of the fo
 ### 13. Update a Bill 
 
 **Endpoint:** PATCH /bills/{bill_id}
+**Description:** Updates the due date or description of a bill.
 
-**Request Body:**
+**Request Path Parameters:**
 
 - `due_date`: string (YYYY-MM-DD)(optional)
   The new due date for the bill
