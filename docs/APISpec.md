@@ -409,7 +409,7 @@ The request body supports partial updates. You may include one or more of the fo
   The current payment status of the bill (e.g., "paid" or "unpaid").
 
 - `roommates`: array of objects
-  A list of roommates and their respective payment statuses.
+- A list of roommates and their respective payment statuses.
     - `roommate_id `: integer
 
       The unique identifier of the roommate.
