@@ -176,7 +176,6 @@ The request body supports partial updates. You may include one or more of the fo
 
 **Response:**
 
-- `success`: boolean
 - `message`: string  
   A confirmation message indicating whether the chore was successfully deleted.
 - `deleted_chore_id`: integer  
@@ -304,6 +303,7 @@ The request body supports partial updates. You may include one or more of the fo
       The name or description of the chore.
       
     - `due_date`: string (YYYY-MM-DD) 
+
       The due date of the chore.
 
 ---
