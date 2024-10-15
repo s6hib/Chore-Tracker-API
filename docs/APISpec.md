@@ -122,7 +122,7 @@ If no query parameters are provided, all chores will be returned.
 
 ### 4. Update a Chore
 
-**Endpoint:** `PUT /chores/{id}`
+**Endpoint:** `PATCH /chores/{id}`
 
 **Request Path Parameter:**
 
