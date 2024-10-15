@@ -285,40 +285,66 @@ The request body supports partial updates. You may include one or more of the fo
       The name or description of the chore.
       
     - `due_date`: string (YYYY-MM-DD) 
-      The due date of the chore.### 9. Get All Roommates
+      The due date of the chore.
 
 ---
 
 ### 10. Get Chores by Roommate
 
-**Endpoint:** `GET /roommates/{id}/chores`  
-**Request Parameters:**
+**Endpoint:** `GET /roommates/{id}/chores`
 
-- `id`: integer
+**Request Path Parameters:**
+
+- `id`: integer (required)  
+  The unique identifier of the roommate whose chores are being retrieved.
 
 **Response:**
 
-- `chores`: array of objects
-  - `id`: integer
-  - `title`: string
-  - `description`: string
-  - `priority`: integer
-  - `duration`: integer
-  - `due_date`: string
-  - `status`: string
+- `chores`: array of objects  
+  A list of chores assigned to the specified roommate.
+
+  - `id`: integer  
+    The unique identifier of the chore.
+    
+  - `title`: string  
+    The title or short name of the chore.
+    
+  - `description`: string  
+    A detailed description of the chore.
+    
+  - `priority`: integer  
+    The priority level of the chore (1-5)
+    
+  - `duration`: integer  
+    Estimated time in minutes required to complete the chore.
+    
+  - `due_date`: string (YYYY-MM-DD)  
+    The date by which the chore must be completed.
+    
+  - `status`: string  
+    The current status of the chore (e.g., "pending," "in-progress," "completed").
 
 ---
 
 ### 11. Create a Bill
 
-**Endpoint:** `POST /bills`  
+**Endpoint:** `POST /bills`
+
 **Request Body:**
 
-- `total_amount`: float
-- `roommate_ids`: array of integers
-- `due_date`: string
+- `total_amount`: float (required)  
+  The total amount of the bill.
+
+- `roommate_ids`: array of integers (required)  
+  A list of unique identifiers of the roommates responsible for paying the bill.
+
+- `due_date`: string (YYYY-MM-DD) (required)  
+  The date by which the bill must be paid.
 
 **Response:**
 
-- `bill_id`: integer
-- `message`: string
+- `bill_id`: integer  
+  The unique identifier of the created bill.
+
+- `message`: string  
+  A confirmation message indicating the successful creation of the bill.
