@@ -30,6 +30,6 @@ After creating the bill, Mia calls `GET /bills` to view the current bills and en
 
 A few days later, Mia receives payment from Alice, so she updates the payment status by calling `PATCH /bills/1/payments` and marking Alice's share as paid. The API responds with a success message.
 
-Later, Bob informs Mia that he might need more time to pay his share. Mia decides to extend the due date for Bob’s payment and updates the bill by calling `PATCH /bills/1` to adjust the due date. The API confirms the update with a success message.
+Later, Bob tells Mia that he might need more time to pay his share. Mia decides to extend the due date for Bob’s payment and updates the bill by calling `PATCH /bills/1` to adjust the due date. The API confirms the update with a success message.
 
-Thanks to the chore tracker, Mia stays on top of shared expenses, ensuring the financial burden is distributed fairly and no one falls behind on payments.
+Thanks to the chore tracker, Mia stays on top of shared household expenses, ensuring the financial burden is managed fairly and no one falls behind on payments.
