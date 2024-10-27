@@ -1,7 +1,7 @@
 from fastapi import FastAPI, exceptions
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from src.api import chores, roommates
+from src.api import chore, roommate, chore_assignment
 import json
 import logging
 from starlette.middleware.cors import CORSMiddleware
@@ -31,8 +31,10 @@ app.add_middleware(
 )
 
 # only including routers needed for Flow #1
-app.include_router(chores.router)
-app.include_router(roommates.router)
+app.include_router(chore.router)
+app.include_router(roommate.router)
+app.include_router(roommate_list.router)
+
 
 @app.exception_handler(exceptions.RequestValidationError)
 @app.exception_handler(ValidationError)
