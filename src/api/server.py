@@ -20,7 +20,7 @@ app = FastAPI(
     },
 )
 
-origins = ["*"]  # Update with your frontend URL in production
+origins = ["*"] # not needed for this project (no front end)
 
 app.add_middleware(
     CORSMiddleware,
