@@ -16,5 +16,5 @@ async def get_api_key(request: Request, api_key_header: str = Security(api_key_h
         return api_key_header
     else:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="YOU FORGOT TO AUTHORIZE WITH THE API KEY!!!"
         )
