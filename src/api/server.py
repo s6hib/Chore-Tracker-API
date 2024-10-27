@@ -33,7 +33,7 @@ app.add_middleware(
 # only including routers needed for Flow #1
 app.include_router(chore.router)
 app.include_router(roommate.router)
-app.include_router(roommate_list.router)
+app.include_router(chore_assignment.router)
 
 
 @app.exception_handler(exceptions.RequestValidationError)
