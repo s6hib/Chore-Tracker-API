@@ -7,7 +7,4 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.get("/roommates/", tags=["roommates"])
-def get_roommates():
-    
-    return "test"
+
