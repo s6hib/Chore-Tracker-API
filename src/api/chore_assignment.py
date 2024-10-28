@@ -17,7 +17,7 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
     with db.engine.begin() as connection:
         chore_id = connection.execute(sqlalchemy.text(
             '''SELECT id 
-            FROM chores 
+            FROM chore 
             WHERE name = :chore_to_assign_name
                 AND location_in_house = :chore_to_assign_location
                 AND frequency = :chore_to_assign_frequency
