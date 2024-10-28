@@ -23,8 +23,19 @@ def get_roommates():
 
 @router.post("/roommates/", tags=["roommate"])
 def create_roommate(new_roommate: Roommate):
-    print(new_roommate)
-    with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text("INSERT INTO roommate (first_name, last_name, email) VALUES (:first_name, :last_name, :email);") , [{"first_name": new_roommate.first_name}, {"last_name": new_roommate.last_name}, {"email": new_roommate.email}])
-        
-    return new_roommate
+    try:
+        with db.engine.begin() as connection:
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO roommate (first_name, last_name, email) 
+                    VALUES (:first_name, :last_name, :email)
+                    """
+                ),
+                {
+                    "first_name": new_roommate.first_name,
+                    "last_name": new_roommate.last_name,
+                    "email": new_roommate.email
+                }
+            )
+        return new_roommate
