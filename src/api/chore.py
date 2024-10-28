@@ -17,4 +17,5 @@ def get_chores():
     chores = [dict(row) for row in result]
 
     print(chores)
+    return "OK"
 
