@@ -12,7 +12,7 @@ router = APIRouter(
 @router.get("/chores/", tags=["chore"])
 def get_chores():
     with db.engine.begin() as connection:
-            connection.execute(sqlalchemy.text("SELECT * FROM chore"))
+            connection.execute(sqlalchemy.text("SELECT * FROM chore")).fetchall()
              
 
     return "OK"
