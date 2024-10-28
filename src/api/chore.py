@@ -15,7 +15,7 @@ def get_chores():
         result = connection.execute(sqlalchemy.text("SELECT * FROM chore")).fetchall()
             
     for chore in result:
-        print(chores)
+        print(chore)
         
     return "OK"
 
