@@ -12,9 +12,9 @@ router = APIRouter(
 )
 
 class Roommate(BaseModel):
-    first_name: string
-    last_name: string
-    email: string
+    first_name: str
+    last_name: str
+    email: str
 
 @router.get("/roommates/", tags=["roommate"])
 def get_roommates():
