@@ -14,8 +14,8 @@ def get_chores():
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM chore")).fetchall()
             
-    chores = [dict(row) for row in result]
-
-    print(chores)
+    for chore in result:
+        print(chores)
+        
     return "OK"
 
