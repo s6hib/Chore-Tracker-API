@@ -7,12 +7,12 @@ import sqlalchemy
 from src import database as db
 
 router = APIRouter(
-    prefix="/chore_assignment",
+    prefix="/assign_chore",
     tags=["chore_assignment"],
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.post("/chores/", tags=["chore"])
+@router.post("/assign_chore/", tags=["chore_assignment"])
 def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
     with db.engine.begin() as connection:
         chore_id = connection.execute(sqlalchemy.text(
