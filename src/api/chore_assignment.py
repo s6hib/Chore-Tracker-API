@@ -49,7 +49,7 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
         connection.execute(sqlalchemy.text(
                 """
                 INSERT INTO chore_assignment (chore_id, roommate_id, status) 
-                VALUES (:chore_id, :roommate_id, 'not_completed')
+                VALUES (:chore_id, :roommate_id, 'in_progress')
                 """
             ),
             {
