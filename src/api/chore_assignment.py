@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from src.api import auth
 from pydantic import BaseModel
+from src.api import auth
 from src.api.roommate import Roommate
 from src.api.chore import Chore
 
@@ -26,7 +26,8 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
                 AND location_in_house = :chore_to_assign_location
                 AND frequency = :chore_to_assign_frequency
                 AND duration_mins = :chore_to_assign_duration
-                AND priority = :chore_to_assign_priority'''
+                AND priority = :chore_to_assign_priority
+                '''
                 ),
                 {
                 "chore_to_assign_name": chore_to_assign.name,
@@ -82,4 +83,4 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
         }
         )
 
-    return {"message": "Chore updated!", "chore_id" : chore_id, "new_status": status_update.status }
+    return {"message": "Chore updated!", "chore_id" : chore_id, "roommmate_id": roommate_id, "new_status": status_update.status }
