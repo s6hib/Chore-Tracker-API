@@ -5,6 +5,8 @@ create table
     location_in_house text null,
     frequency text null,
     duration_mins bigint null default '0'::bigint,
+    priority INTEGER CHECK (priority BETWEEN 1 AND 5),
+    due_date DATE,
     constraint chore_pkey primary key (id)
   ) tablespace pg_default;
 
@@ -25,7 +27,8 @@ create table
     status text null,
     constraint chore_assignment_pkey primary key (id),
     constraint chore_assignment_chore_id_fkey foreign key (chore_id) references chore (id),
-    constraint chore_assignment_roommate_id_fkey foreign key (roommate_id) references roommate (id)
+    constraint chore_assignment_roommate_id_fkey foreign key (roommate_id) references roommate (id),
+    constraint status_check CHECK (status IN ('pending', 'in_progress', 'completed'))
   ) tablespace pg_default;
 
 create table
