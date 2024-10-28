@@ -13,7 +13,7 @@ class Chore(BaseModel):
     frequency: str
     duration_mins: int
     priority: int
-    due_date: datetime.datetime
+    due_date: datetime.date
 
 router = APIRouter(
     prefix="/chore",
