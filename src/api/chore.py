@@ -7,4 +7,12 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+@router.get("/chores/", tags=["chore"])
+def get_chores():
+     with db.engine.begin() as connection:
+            connection.execute(sqlalchemy.text("SELECT * FROM chore"))
+             
+
+    return "OK"
+
 
