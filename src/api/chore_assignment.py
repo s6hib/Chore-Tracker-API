@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from src.api import auth
+from pydantic import BaseModel
 from src.api.roommate import Roommate
 from src.api.chore import Chore
 
@@ -11,6 +12,9 @@ router = APIRouter(
     tags=["chore_assignment"],
     dependencies=[Depends(auth.get_api_key)],
 )
+
+class ChoreStatusUpdate(BaseModel):
+    status: str
 
 @router.post("/assign_chore/", tags=["chore_assignment"])
 def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
@@ -59,3 +63,23 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
         )
         
     return {"chore_id": chore_id.id, "roommate":roommate_id.id, "status": "in_progress"}
+
+@router.post("/update_status/", tags=["chore_assignment"])
+def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreStatusUpdate):
+    with db.engine.begin() as connection:
+        connection.execute(sqlalchemy.text(
+            """
+            UPDATE chore_assignment
+            SET status = :status
+            WHERE chore_id = :chore_id
+            AND roommate_id = :roommate_id
+            """
+        ),
+        {
+            "status": status_update.status,
+            "chore_id": chore_id,
+            "roommate_id": roommate_id
+        }
+        )
+
+    return {"message": "Chore updated!", "chore_id" : chore_id, "new_status": status_update.status }
