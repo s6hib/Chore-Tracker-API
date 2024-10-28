@@ -53,8 +53,8 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
                 """
             ),
             {
-                "chore_id": chore_id,
-                "roommate_id": roommate_id
+                "chore_id": chore_id.id,
+                "roommate_id": roommate_id.id
             }
         )
         
