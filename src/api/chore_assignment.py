@@ -58,4 +58,4 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
             }
         )
         
-    return {"chore_id": chore_id, "roommate":roommate_id, "status": "not completed"}
+    return {"chore_id": chore_id, "roommate":roommate_id, "status": "in_progress"}
