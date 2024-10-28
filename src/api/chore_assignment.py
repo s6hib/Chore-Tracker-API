@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from src.api import auth
-from roommate import Roommate
-from chore import Chore
+from src.api.roommate import Roommate
+from src.api.chore import Chore
 
 import sqlalchemy
 from src import database as db
