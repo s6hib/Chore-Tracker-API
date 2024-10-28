@@ -18,11 +18,11 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
         chore_id = connection.execute(sqlalchemy.text(
             '''SELECT id 
             FROM chores 
-            WHERE name = :chore_to_assign_name, 
-                location_in_house = :chore_to_assign_location, 
-                frequency = :chore_to_assign_frequency,
-                duration_mins = :chore_to_assign_duration,
-                priority = :chore_to_assign_priority'''
+            WHERE name = :chore_to_assign_name
+                AND location_in_house = :chore_to_assign_location
+                AND frequency = :chore_to_assign_frequency
+                AND duration_mins = :chore_to_assign_duration
+                AND priority = :chore_to_assign_priority'''
                 ),
                 {
                 "chore_to_assign_name": chore_to_assign.name,
@@ -35,9 +35,9 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
         roommate_id = connection.execute(sqlalchemy.text(
             '''SELECT id 
             FROM roommate 
-            WHERE first_name = :first_name,
-                last_name = :last_name,
-                email = :email'''
+            WHERE first_name = :first_name
+                AND last_name = :last_name
+                AND email = :email'''
                 ),
                 {
                 "first_name": roommate_to_assign.first_name,
