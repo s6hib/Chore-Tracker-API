@@ -32,7 +32,14 @@ def get_chores():
     chore_list = []
             
     for chore in result:
-        chore_list.append(chore)
+        chore_list.append({
+            "name": chore.name,
+            "location_in_house": chore.location_in_house,
+            "frequency": chore.frequency,
+            "duration": chore.duration_mins,
+            "priority": chore.priority,
+            "due_date": chore.due_date
+            })
         print(chore)
         
     return chore_list
