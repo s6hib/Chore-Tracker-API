@@ -53,7 +53,7 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
         
         connection.execute(sqlalchemy.text(
                 """
-                INSERT INTO chore_assignment (chore_id, roommate_id) 
+                INSERT INTO chore_assignment (chore_id, roommate_id, status) 
                 VALUES (:chore_id, :roommate_id, 'pending')
                 """
             ),
@@ -64,3 +64,21 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
         )
         
     return {"chore_id": chore_id.id, "roommate":roommate_id.id, "status": "pending"}
+
+
+@router.post("/update_chore_status/", tags=["chore_assignment"])
+def update_chore_status(chore_id:int, roommate_id:int):
+    with db.engine.begin() as connection:
+        connection.execute(sqlalchemy.text(
+            '''UPDATE chore_assignment 
+            SET status = 'completed'
+            WHERE chore_id = :chore_id
+                AND roommate_id = :roommate_id'''),
+                {
+                    "chore_id": chore_id, 
+                    "roommate_id": roommate_id
+                    }
+        )
+
+
+    return {"chore_id": chore_id, "roommate_id": roommate_id, "status": "completed"}
