@@ -23,18 +23,18 @@ router = APIRouter(
 )
 
 @router.get("/chores/", tags=["chore"])
-def get_chores(priority, status):
+def get_chores():
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(
             '''SELECT * 
             FROM chore 
-            WHERE priority = :priority
-            AND status = :status'''), {"priority": priority, "status": status}).fetchall()
+            WHERE priority = 5
+            AND status = pending''')).fetchall()
     
     chore_list = []
             
     for chore in result:
-        chore_list.append(chore)
+        print(chore)
         
     return chore_list
 
