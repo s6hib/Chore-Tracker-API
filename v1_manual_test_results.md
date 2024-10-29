@@ -90,4 +90,14 @@ curl -X 'POST' \
 
 Update chore status:
 
-  
+curl -X 'POST' \
+  'http://127.0.0.1:3000/assign_chore/update_chore_status/?chore_id=1&roommate_id=2' \
+  -H 'accept: application/json' \
+  -H 'access_token: a' \
+  -d ''
+
+{
+  "chore_id": 1,
+  "roommate_id": 2,
+  "status": "completed"
+}
