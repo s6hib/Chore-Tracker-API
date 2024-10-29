@@ -1,0 +1,16 @@
+{
+  "chore_to_assign": {
+    "name": "wash dishes",
+    "location_in_house": "kitchen",
+    "frequency": "daily",
+    "duration_mins": 20,
+    "priority": 4,
+    "due_date": "2024-10-27"
+  },
+  "roommate_to_assign": {
+    "first_name": "Antony",
+    "last_name": "LeGoat",
+    "email": "bigballer@gmail.com"
+  }
+}
+

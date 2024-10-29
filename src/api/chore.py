@@ -14,6 +14,7 @@ class Chore(BaseModel):
     duration_mins: int
     priority: int
     due_date: datetime.date
+    status: str
 
 router = APIRouter(
     prefix="/chore",
@@ -22,12 +23,21 @@ router = APIRouter(
 )
 
 @router.get("/chores/", tags=["chore"])
-def get_chores():
+def get_chores(
+    priority: str = "",
+    status: str = ""
+):
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT * FROM chore")).fetchall()
+        result = connection.execute(sqlalchemy.text(
+            '''SELECT * 
+            FROM chore 
+            WHERE priority = :priority
+            AND status = :status'''), {"priority": priority, "status": status}).fetchall()
+    
+    chore_list = []
             
     for chore in result:
-        print(chore)
+        chore_list.append(chore)
         
-    return "OK"
+    return chore_list
 
