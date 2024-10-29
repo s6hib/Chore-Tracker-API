@@ -81,4 +81,9 @@ def update_chore_status(chore_id:int, roommate_id:int):
         )
 
 
-    return {"chore_id": chore_id, "roommate_id": roommate_id, "status": "completed"}
+    return {
+        "message": "Chore status updated successfully.",
+        "chore_id": chore_id, 
+        "roommate_id": roommate_id, 
+        "status": "completed"
+        }
