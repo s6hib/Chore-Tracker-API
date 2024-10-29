@@ -97,7 +97,7 @@ curl -X 'POST' \
   -d ''
 
 {
-  "chore_id": 1,
-  "roommate_id": 2,
+  "chore_id": 2,
+  "roommate_id": 3,
   "status": "completed"
 }
