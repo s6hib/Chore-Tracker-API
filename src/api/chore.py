@@ -32,6 +32,7 @@ def get_chores():
     chore_list = []
             
     for chore in result:
+        chore_list.append(chore)
         print(chore)
         
     return chore_list
