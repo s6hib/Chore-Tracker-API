@@ -24,8 +24,8 @@ router = APIRouter(
 
 @router.get("/chores/", tags=["chore"])
 def get_chores(
-    priority: str = "",
-    status: str = ""
+    priority: int,
+    status: str
 ):
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(
