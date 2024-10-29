@@ -8,7 +8,6 @@ CREATE TABLE public.chore (
     duration_mins bigint null default '0'::bigint,
     priority integer null,
     due_date date null,
-    CONSTRAINT status_check CHECK (status IN ('pending', 'in_progress', 'completed'))
     CONSTRAINT chore_pkey PRIMARY KEY (id),
     CONSTRAINT chore_priority_check CHECK (
         (priority >= 1) AND (priority <= 5)
@@ -36,6 +35,7 @@ create table
     chore_id bigint null,
     roommate_id bigint null,
     status text null,
+    constraint status_check CHECK (status IN ('pending', 'in_progress', 'completed'))
     constraint chore_assignment_pkey primary key (id),
     constraint chore_assignment_chore_id_fkey foreign key (chore_id) references chore (id),
     constraint chore_assignment_roommate_id_fkey foreign key (roommate_id) references roommate (id),

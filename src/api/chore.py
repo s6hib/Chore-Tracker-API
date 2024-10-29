@@ -14,7 +14,6 @@ class Chore(BaseModel):
     duration_mins: int
     priority: int
     due_date: datetime.date
-    status: str
 
 router = APIRouter(
     prefix="/chore",
@@ -28,8 +27,7 @@ def get_chores():
         result = connection.execute(sqlalchemy.text(
             '''SELECT * 
             FROM chore 
-            WHERE priority = 5
-            AND status = pending''')).fetchall()
+            WHERE priority = 5''')).fetchall()
     
     chore_list = []
             

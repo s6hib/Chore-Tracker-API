@@ -54,7 +54,7 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
         connection.execute(sqlalchemy.text(
                 """
                 INSERT INTO chore_assignment (chore_id, roommate_id) 
-                VALUES (:chore_id, :roommate_id)
+                VALUES (:chore_id, :roommate_id, 'pending')
                 """
             ),
             {
@@ -63,4 +63,4 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
             }
         )
         
-    return {"chore_id": chore_id.id, "roommate":roommate_id.id, "status": "in_progress"}
+    return {"chore_id": chore_id.id, "roommate":roommate_id.id, "status": "pending"}
