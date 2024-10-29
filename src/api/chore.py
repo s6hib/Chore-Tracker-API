@@ -23,10 +23,7 @@ router = APIRouter(
 )
 
 @router.get("/chores/", tags=["chore"])
-def get_chores(
-    priority: int,
-    status: str
-):
+def get_chores(priority, status):
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(
             '''SELECT * 
