@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from src.api import auth
 from src.api.roommate import Roommate
 from src.api.chore import Chore
@@ -12,6 +13,9 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+class ChoreStatusUpdate(BaseModel):
+    status: str
+
 @router.post("/assign_chore/", tags=["chore_assignment"])
 def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
     with db.engine.begin() as connection:
@@ -22,7 +26,8 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
                 AND location_in_house = :chore_to_assign_location
                 AND frequency = :chore_to_assign_frequency
                 AND duration_mins = :chore_to_assign_duration
-                AND priority = :chore_to_assign_priority'''
+                AND priority = :chore_to_assign_priority
+                '''
                 ),
                 {
                 "chore_to_assign_name": chore_to_assign.name,
@@ -58,4 +63,4 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
             }
         )
         
-    return {"chore_id": chore_id.id, "roommate":roommate_id.id}
+    return {"chore_id": chore_id.id, "roommate":roommate_id.id, "status": "in_progress"}
