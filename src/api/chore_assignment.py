@@ -87,3 +87,10 @@ def update_chore_status(chore_id:int, roommate_id:int):
         "roommate_id": roommate_id, 
         "status": "completed"
         }
+
+@router.get("/get_completed_chores/", tags=["chore_assignment"])
+def get_completed_chores(): #accept inputs for dynamic time window
+    with db.engine.begin() as connection:
+        connection.execute(sqlalchemy.text(
+            '''SELECT 
+            '''))
