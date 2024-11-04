@@ -17,7 +17,7 @@ class bill(BaseModel):
     due_date: datetime.date
     bill_type: str
     message: str
-    roommate: str
+    roommate_id: int
     status: str
 
 @router.post("/create_bill", tags=["bill"])
@@ -74,7 +74,7 @@ def get_bills():
             "due_date": bill.due_date,
             "bill_type": bill.bill_type,
             "message": bill.message,
-            "roommate_id": bill.roommate,
+            "roommate_id": bill.roommate_id,
             "status": bill.status
             })
         print(bill)
