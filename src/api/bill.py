@@ -13,6 +13,8 @@ router = APIRouter(
 )
 
 class bill(BaseModel):
+    cost: float
+    due_date: datetime.date
     bill_type: str
     message: str
     roommate: str
@@ -54,4 +56,27 @@ def create_bill(bill_to_assign: Bill):
         "message": "Bill created and assigned to roommates."
     }   
 
-        
+@router.get("/bills/", tags=["bill"])
+def get_bills():
+    with db.engine.begin() as connection:
+       result = connection.execute(sqlalchemy.text(
+            '''SELECT cost, due_date, bill_type, message,
+            b.roommate_id, b.status
+            FROM bill 
+            JOIN bill_list b ON b.bill_id = bill.id''')).fetchall() 
+
+    bill_list = []
+
+    for bill in result:
+        bill_list.append({
+            "cost": bill.cost,
+            "due_date": bill.due_date,
+            "bill_type": bill.bill_type,
+            "message": bill.message,
+            "roommate_id": bill.roommate,
+            "status": bill.status
+            })
+        print(bill)
+
+    return bill_list
+   
