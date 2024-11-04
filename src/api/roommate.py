@@ -38,4 +38,4 @@ def create_roommate(new_roommate: Roommate):
                 "email": new_roommate.email
             }
         ).fetchone()
-    return {"new roommate": new_roommate, "roommate id": roommate_id}
+    return {"First Name": new_roommate.first_name, "Last Name": new_roommate.last_name, "Email": new_roommate.email, "roommate id": roommate_id.id}

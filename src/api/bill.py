@@ -30,7 +30,7 @@ class Bill(BaseModel):
     message: Optional[str]
 
 @router.post("/create_bill", tags=["bill"])
-def create_bill(bill_to_assign: Bill):
+def create_bill(bill_to_assign: bill):
     with db.engine.begin() as connection:
         add_bill_query = connection.execute(sqlalchemy.text(
             """
@@ -63,6 +63,7 @@ def create_bill(bill_to_assign: Bill):
         "message": "Bill created and assigned to roommates."
     }   
 
+
 @router.get("/bills/", tags=["bill"])
 def get_bills():
     with db.engine.begin() as connection:
@@ -88,4 +89,14 @@ def get_bills():
         print(bill)
 
     return bill_list
+
+
+#@router.get("/bills/", tags=["bill"])
+#def patch_bills():
+    #with db.engine.begin() as connection:
+       #result = connection.execute(sqlalchemy.text(
+      # '''UPDATE bill SET due_date?
+
+      # '''))
+       
    
