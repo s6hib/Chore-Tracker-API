@@ -56,6 +56,14 @@ def create_bill(bill_to_assign: Bill):
         "message": "Bill created and assigned to roommates."
     }   
 
+#@router.get("/bills/", tags=["bill"])
+#def patch_bills():
+    #with db.engine.begin() as connection:
+       #result = connection.execute(sqlalchemy.text()).fetchall()
+       # some stuff 
+
+
+
 @router.get("/bills/", tags=["bill"])
 def get_bills():
     with db.engine.begin() as connection:
