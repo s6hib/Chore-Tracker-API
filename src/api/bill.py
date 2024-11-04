@@ -65,7 +65,7 @@ def create_bill(bill_to_assign: Bill):
 
 
 @router.get("/bills/", tags=["bill"])
-def get_bills():
+def get_bill():
     with db.engine.begin() as connection:
        result = connection.execute(sqlalchemy.text(
             '''SELECT cost, due_date, bill_type, message,
@@ -100,7 +100,7 @@ class PaymentUpdate(BaseModel):
     status: StatusEnum
 
 @router.patch("/bills/{bill_id}/payments", tags=["bill"])
-def patch_bills(bill_id: int, payment_update: PaymentUpdate):
+def update_bill_status(bill_id: int, payment_update: PaymentUpdate):
     with db.engine.begin() as connection:     
        result = connection.execute(sqlalchemy.text(
            """
@@ -114,7 +114,54 @@ def patch_bills(bill_id: int, payment_update: PaymentUpdate):
           "roommate_id" : payment_update.roommate_id,
           "status" : payment_update.status.value
         })
+       if result.rowcount == 0:
+           return {"message": "No bill found with the specified ID."}
 
     return {"message": f"Payment status for roommate {payment_update.roommate_id} on bill {bill_id} updated to {payment_update.status.value}."}
-       
-   
+
+class BillUpdate(BaseModel):
+    due_date: Optional[datetime.date] = None
+    cost: Optional[float] = None
+    bill_type: Optional[BillTypeEnum] = None
+    message: Optional[str] = None
+
+@router.patch("/bills/{bill_id}", tags=["bill"])
+def update_bill(bill_id: int, bill_update: BillUpdate):
+    update_fields = {}
+    sql_set_clause = []
+
+    if bill_update.due_date is not None:
+        sql_set_clause.append("due_date =:due_date")
+        update_fields["due_date"] = bill_update.due_date
+
+    if bill_update.cost is not None:
+        sql_set_clause.append("cost =:cost")
+        update_fields["cost"] = bill_update.cost
+    
+    if bill_update.bill_type is not None:
+        sql_set_clause.append("bill_type = :bill_type")
+        update_fields["bill_type"] = bill_update.bill_type.value
+
+    if bill_update.message is not None:
+        sql_set_clause.append("message =:message")
+        update_fields["message"] = bill_update.message
+    
+    if not sql_set_clause:
+        return {"message": "You are not changing anything~"}
+
+    sql_set_clause_str = ",".join(sql_set_clause)
+    
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(
+            f"""
+            UPDATE bill
+            SET {sql_set_clause_str}
+            WHERE id = :bill_id
+            """
+        ), {
+            "bill_id": bill_id, **update_fields
+        })
+
+        if result.rowcount == 0:
+            return {"message": "There is no bill with the bill id you provided."}
+    return {"message": f"Bill ID: {bill_id} is updated successfully."}
