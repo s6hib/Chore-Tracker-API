@@ -30,7 +30,7 @@ class Bill(BaseModel):
     message: Optional[str]
 
 @router.post("/create_bill", tags=["bill"])
-def create_bill(bill_to_assign: bill):
+def create_bill(bill_to_assign: Bill):
     with db.engine.begin() as connection:
         add_bill_query = connection.execute(sqlalchemy.text(
             """
