@@ -90,13 +90,31 @@ def get_bills():
 
     return bill_list
 
+class StatusEnum(str, Enum):
+    unpaid = 'unpaid'
+    paid = 'paid'
+    overdue = 'overdue'
 
-#@router.get("/bills/", tags=["bill"])
-#def patch_bills():
-    #with db.engine.begin() as connection:
-       #result = connection.execute(sqlalchemy.text(
-      # '''UPDATE bill SET due_date?
+class PaymentUpdate(BaseModel):
+    roommate_id: int
+    status: StatusEnum
 
-      # '''))
+@router.patch("/bills/{bill_id}/payments", tags=["bill"])
+def patch_bills(bill_id: int, payment_update: PaymentUpdate):
+    with db.engine.begin() as connection:     
+       result = connection.execute(sqlalchemy.text(
+           """
+            UPDATE bill_list
+            SET status =:status
+            WHERE bill_id = :bill_id AND roommate_id = :roommate_id
+            """
+
+      ), {
+          "bill_id" : bill_id, 
+          "roommate_id" : payment_update.roommate_id,
+          "status" : payment_update.status.value
+        })
+
+    return {"message": f"Payment status for roommate {payment_update.roommate_id} on bill {bill_id} updated to {payment_update.status.value}."}
        
    
