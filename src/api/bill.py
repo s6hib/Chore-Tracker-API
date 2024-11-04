@@ -44,4 +44,8 @@ def get_bills():
         
     return bill_list
 
+@router.get("/bills/", tags=["bill"])
+def patch_bills():
+    with db.engine.begin() as connection:
+       result = connection.execute(sqlalchemy.text()).fetchall() 
 
