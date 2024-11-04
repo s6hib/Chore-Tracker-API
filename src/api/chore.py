@@ -74,7 +74,7 @@ def get_chore_history():
         history_list.append({
             "title": record.chore_name,
             "completed_by": f"{record.first_name} {record.last_name}",
-            "completion_date": record.completion_date.strftime("%-d")  # just the day number
+            "completion_date": record.completion_date  # removed strftime formatting to show full date
         })
     
     return history_list
