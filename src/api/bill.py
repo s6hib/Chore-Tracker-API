@@ -17,11 +17,11 @@ class bill(BaseModel):
     due_date: datetime.date
     bill_type: str
     message: str
-    roommate: str
+    roommate_id: int
     status: str
 
 @router.post("/create_bill", tags=["bill"])
-def create_bill(bill_to_assign: Bill):
+def create_bill(bill_to_assign: bill):
     with db.engine.begin() as connection:
         add_bill_query = connection.execute(sqlalchemy.text(
             """
@@ -45,7 +45,7 @@ def create_bill(bill_to_assign: Bill):
             INSERT INTO bill_list(bill_id, roommate_id, status)
             VALUES (:bill_id, :roommate_id, :status)
             """
-        ){
+        ),{
             "bill_id": bill_id,
             "roommate_id": roommate_id,
             "status": "unpaid"
@@ -55,13 +55,6 @@ def create_bill(bill_to_assign: Bill):
         "bill_id": bill_id,
         "message": "Bill created and assigned to roommates."
     }   
-
-#@router.get("/bills/", tags=["bill"])
-#def patch_bills():
-    #with db.engine.begin() as connection:
-       #result = connection.execute(sqlalchemy.text()).fetchall()
-       # some stuff 
-
 
 
 @router.get("/bills/", tags=["bill"])
@@ -81,10 +74,20 @@ def get_bills():
             "due_date": bill.due_date,
             "bill_type": bill.bill_type,
             "message": bill.message,
-            "roommate_id": bill.roommate,
+            "roommate_id": bill.roommate_id,
             "status": bill.status
             })
         print(bill)
 
     return bill_list
+
+
+#@router.get("/bills/", tags=["bill"])
+#def patch_bills():
+    #with db.engine.begin() as connection:
+       #result = connection.execute(sqlalchemy.text(
+      # '''UPDATE bill SET due_date?
+
+      # '''))
+       
    
