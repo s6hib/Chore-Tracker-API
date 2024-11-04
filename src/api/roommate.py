@@ -6,7 +6,7 @@ import sqlalchemy
 from src import database as db
 
 router = APIRouter(
-    prefix="/roommate",
+    prefix="",
     tags=["roommate"],
     dependencies=[Depends(auth.get_api_key)],
 )
@@ -16,12 +16,12 @@ class Roommate(BaseModel):
     last_name: str
     email: str
 
-@router.get("/roommates/", tags=["roommate"])
+@router.get("/get_roommates/", tags=["roommate"])
 def get_roommates():
     
     return "test"
 
-@router.post("/roommates/", tags=["roommate"])
+@router.post("/create_roommates/", tags=["roommate"])
 def create_roommate(new_roommate: Roommate):
     with db.engine.begin() as connection:
         connection.execute(

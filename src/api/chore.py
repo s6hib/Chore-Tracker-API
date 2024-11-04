@@ -16,7 +16,7 @@ class Chore(BaseModel):
     due_date: datetime.date
 
 router = APIRouter(
-    prefix="/chore",
+    prefix="",
     tags=["chore"],
     dependencies=[Depends(auth.get_api_key)],
 )
@@ -44,7 +44,7 @@ def get_chores():
         
     return chore_list
 
-@router.get("/chores/history", tags=["chore"])
+@router.get("/history", tags=["chore"])
 def get_chore_history():
     # calculate date 30 days ago
     thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)

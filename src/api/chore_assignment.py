@@ -8,7 +8,7 @@ import sqlalchemy
 from src import database as db
 
 router = APIRouter(
-    prefix="/assign_chore",
+    prefix="",
     tags=["chore_assignment"],
     dependencies=[Depends(auth.get_api_key)],
 )
