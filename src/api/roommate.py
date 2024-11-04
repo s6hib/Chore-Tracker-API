@@ -24,11 +24,12 @@ def get_roommates():
 @router.post("/create_roommates/", tags=["roommate"])
 def create_roommate(new_roommate: Roommate):
     with db.engine.begin() as connection:
-        connection.execute(
+        roommate_id = connection.execute(
             sqlalchemy.text(
                 """
                 INSERT INTO roommate (first_name, last_name, email) 
                 VALUES (:first_name, :last_name, :email)
+                RETURNING id
                 """
             ),
             {
@@ -36,5 +37,5 @@ def create_roommate(new_roommate: Roommate):
                 "last_name": new_roommate.last_name,
                 "email": new_roommate.email
             }
-        )
-    return new_roommate
+        ).fetchone()
+    return {"new roommate": new_roommate, "roommate id": roommate_id}
