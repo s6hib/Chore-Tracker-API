@@ -6,7 +6,7 @@ import sqlalchemy
 from src import database as db
 
 router = APIRouter(
-    prefix="/roommate",
+    prefix="",
     tags=["roommate"],
     dependencies=[Depends(auth.get_api_key)],
 )
@@ -16,19 +16,20 @@ class Roommate(BaseModel):
     last_name: str
     email: str
 
-@router.get("/roommates/", tags=["roommate"])
+@router.get("/get_roommates/", tags=["roommate"])
 def get_roommates():
     
     return "test"
 
-@router.post("/roommates/", tags=["roommate"])
+@router.post("/create_roommates/", tags=["roommate"])
 def create_roommate(new_roommate: Roommate):
     with db.engine.begin() as connection:
-        connection.execute(
+        roommate_id = connection.execute(
             sqlalchemy.text(
                 """
                 INSERT INTO roommate (first_name, last_name, email) 
                 VALUES (:first_name, :last_name, :email)
+                RETURNING id
                 """
             ),
             {
@@ -36,5 +37,5 @@ def create_roommate(new_roommate: Roommate):
                 "last_name": new_roommate.last_name,
                 "email": new_roommate.email
             }
-        )
-    return new_roommate
+        ).fetchone()
+    return {"new roommate": new_roommate, "roommate id": roommate_id}
