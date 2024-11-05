@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
 from src.api.roommate import Roommate
@@ -37,6 +37,10 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
                 "chore_to_assign_priority": chore_to_assign.priority
                 }
         ).fetchone()
+
+        if chore_id is None:
+            raise HTTPException(status_code=404, detail="Chore not found")
+        
         roommate_id = connection.execute(sqlalchemy.text(
             '''SELECT id 
             FROM roommate 
@@ -50,6 +54,9 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
                 "email": roommate_to_assign.email
                 }
         ).fetchone()
+
+        if roommate_id is None:
+            raise HTTPException(status_code=404, detail="Roommate not found")
         
         connection.execute(sqlalchemy.text(
                 """
