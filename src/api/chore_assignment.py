@@ -16,7 +16,7 @@ router = APIRouter(
 class ChoreStatusUpdate(BaseModel):
     status: str
 
-@router.post("/assign_chore/", tags=["chore_assignment"])
+@router.post("/assign_chore", tags=["chore_assignment"])
 def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
     with db.engine.begin() as connection:
         chore_id = connection.execute(sqlalchemy.text(
@@ -66,7 +66,7 @@ def assign_chore(chore_to_assign: Chore, roommate_to_assign: Roommate):
     return {"chore_id": chore_id.id, "roommate":roommate_id.id, "status": "pending"}
 
 
-@router.post("/update_chore_status/", tags=["chore_assignment"])
+@router.post("/update_chore_status", tags=["chore_assignment"])
 def update_chore_status(chore_id:int, roommate_id:int):
     with db.engine.begin() as connection:
         connection.execute(sqlalchemy.text(

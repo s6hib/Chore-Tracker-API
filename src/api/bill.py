@@ -64,7 +64,7 @@ def create_bill(bill_to_assign: Bill):
     }   
 
 
-@router.get("/get_bill/", tags=["bill"])
+@router.get("/get_bill", tags=["bill"])
 def get_bill():
     with db.engine.begin() as connection:
        result = connection.execute(sqlalchemy.text(

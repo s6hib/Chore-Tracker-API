@@ -5,6 +5,7 @@ import datetime
 from enum import Enum
 import sqlalchemy
 from src import database as db
+from typing import Optional, List
 
 class FrequencyEnum(str, Enum):
     daily = 'daily'
@@ -23,7 +24,7 @@ class Chore(BaseModel):
     due_date: datetime.date
 
 router = APIRouter(
-    prefix="",
+    prefix="/chores",
     tags=["chore"],
     dependencies=[Depends(auth.get_api_key)],
 )
@@ -50,13 +51,24 @@ def create_chore(chore: Chore):
     
     return {"message": f"Chore {chore.name} created successully.", "chore_id": chore_id }
 
-@router.get("/get_chore/", tags=["chore"])
-def get_chores():
+@router.get("/get_chore", tags=["chore"])
+def get_chores(priority: Optional[int] = None):
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(
-            '''SELECT * 
-            FROM chore 
-            WHERE priority = 5''')).fetchall()
+        if priority is not None:
+            result = connection.execute(sqlalchemy.text(
+                '''
+                SELECT name, location_in_house, frequency, duration_mins, priority, due_date
+                FROM chore
+                WHERE priority = :priority
+                '''
+            ), {"priority": priority}).fetchall()
+        else:
+            result = connection.execute(sqlalchemy.text(
+                '''
+                SELECT name, location_in_house, frequency, duration_mins, priority, due_date
+                FROM chore
+                '''
+            )).fetchall()
     
     chore_list = []
             
