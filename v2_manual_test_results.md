@@ -69,7 +69,33 @@ curl -X 'POST' \
   }
 }'
 
+{
+  "chore_id": 3,
+  "roommate": 10,
+  "status": "pending"
+}
+
 Create Chore
+curl -X 'POST' \
+  'https://chore-tracker-api.onrender.com/chores/create_chore' \
+  -H 'accept: application/json' \
+  -H 'access_token: a' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "Clean the bathroom",
+  "location_in_house": "bathroom",
+  "frequency": "weekly",
+  "duration_mins": 20,
+  "priority": 5,
+  "due_date": "2024-11-09"
+}'
+
+{
+  "message": "Chore Clean the bathroom created successully.",
+  "chore_id": 9
+}
+
+Assign Chore
 curl -X 'POST' \
   'https://chore-tracker-api.onrender.com/assign_chore/' \
   -H 'accept: application/json' \
@@ -90,8 +116,12 @@ curl -X 'POST' \
     "email": "Lsmith@gmail.com"
   }
 }'
-NOT WORKING GIVES ERROR DOESNT CREATE CHORE
 
+{
+  "chore_id": 9,
+  "roommate": 10,
+  "status": "pending"
+}
 
 workflow 3. Mia Manages Shared Expenses and Creates a Bill
 
