@@ -2,15 +2,22 @@ from fastapi import APIRouter, Depends
 from src.api import auth
 from pydantic import BaseModel
 import datetime
-
+from enum import Enum
 import sqlalchemy
 from src import database as db
 
+class FrequencyEnum(str, Enum):
+    daily = 'daily'
+    weekly = 'weekly'
+    biweekly = 'biweekly'
+    monthly = 'monthly'
+    bimonthly = 'bimonthly'
+    yearly = 'yearly'
 
 class Chore(BaseModel):
     name: str
     location_in_house: str
-    frequency: str
+    frequency: FrequencyEnum
     duration_mins: int
     priority: int
     due_date: datetime.date
@@ -21,7 +28,29 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.get("/chores/", tags=["chore"])
+@router.post("/create_chore", tags=["chore"])
+def create_chore(chore: Chore):
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(
+            """
+            INSERT into chore(name, location_in_house, frequency, duration_mins, priority, due_date)
+            VALUES (:name, :location_in_house, :frequency, :duration_mins, :priority, :due_date)
+            RETURNING id
+            """
+        ),{
+            "name": chore.name,
+            "location_in_house": chore.location_in_house,
+            "frequency": chore.frequency.value,
+            "duration_mins": chore.duration_mins,
+            "priority": chore.priority, # from 1 to 5 only or it will cause an error
+            "due_date": chore.due_date
+        })
+    
+    chore_id = result.scalar_one()
+    
+    return {"message": f"Chore {chore.name} created successully.", "chore_id": chore_id }
+
+@router.get("/get_chore/", tags=["chore"])
 def get_chores():
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(
@@ -78,3 +107,6 @@ def get_chore_history():
         })
     
     return history_list
+
+
+

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from src.api import auth
 import datetime
 from enum import Enum
@@ -120,12 +120,22 @@ def update_bill_status(bill_id: int, payment_update: PaymentUpdate):
     return {"message": f"Payment status for roommate {payment_update.roommate_id} on bill {bill_id} updated to {payment_update.status.value}."}
 
 class BillUpdate(BaseModel):
-    due_date: Optional[datetime.date] = None
-    cost: Optional[float] = None
-    bill_type: Optional[BillTypeEnum] = None
-    message: Optional[str] = None
+    due_date: Optional[datetime.date] = Field(None, example="YYYY-MM-DD")  # Placeholder for date
+    cost: Optional[float] = Field(None, example=0.0)  # Placeholder for a cost value
+    bill_type: Optional[BillTypeEnum] = Field(None, example="string")  # Placeholder for Enum
+    message: Optional[str] = Field(None, example="string")  # Placeholder for a message
 
-@router.patch("/update_bills/{bill_id}", tags=["bill"])
+    class Config:
+        schema_extra = {
+            "example": {
+                "due_date": "2024-12-31",      # Example date format
+                "cost": 0.0,                 # Example cost
+                "bill_type": "string",         # Placeholder to show it’s a string field
+                "message": "string"            # Placeholder for a generic text field
+            }
+        }
+
+@router.patch("/update_bills/{bill_id}", tags=["bill"], response_model=dict)
 def update_bill(bill_id: int, bill_update: BillUpdate):
     update_fields = {}
     sql_set_clause = []
