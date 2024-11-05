@@ -9,7 +9,7 @@ from src.api.roommate import Roommate
 from typing import List, Optional
 
 router = APIRouter(
-    prefix="",
+    prefix="/bills",
     tags=["bill"],
     dependencies=[Depends(auth.get_api_key)],
 )
