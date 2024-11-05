@@ -46,43 +46,20 @@ curl -X 'POST' \
   "status": "pending"
 }
 
-curl -X 'POST' \
- 'http://127.0.0.1:3000/assign_chore/assign_chore/' \
- -H 'accept: application/json' \
- -H 'access_token: a' \
- -H 'Content-Type: application/json' \
- -d '{
-"chore_to_assign": {
-"name": "mop floors",
-"location_in_house": "All rooms",
-"frequency": "weekly",
-"duration_mins": 25,
-"priority": 5,
-"due_date": "2024-10-27"
-},
-"roommate_to_assign": {
-"first_name": "Billy",
-"last_name": "Bob",
-"email": "billybob@gmail.com"
-}
-}'
-
-{
-"chore_id": 1,
-"roommate": 3,
-"status": "pending"
-}
-
 Update chore status:
 
-curl -X 'POST' \
- 'http://127.0.0.1:3000/assign_chore/update_chore_status/?chore_id=1&roommate_id=2' \
- -H 'accept: application/json' \
- -H 'access_token: a' \
- -d ''
+curl -X 'PATCH' \
+  'http://127.0.0.1:8000/chores/2/assignments/3/status' \
+  -H 'accept: application/json' \
+  -H 'access_token: a' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "status": "pending"
+}' 
 
 {
-"chore_id": 2,
-"roommate_id": 3,
-"status": "completed"
+  "message": "Chore status updated successfully!",
+  "chore_id": 2,
+  "roommate_id": 3,
+  "new_status": "pending"
 }
