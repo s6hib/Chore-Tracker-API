@@ -18,7 +18,9 @@ CREATE TABLE public.chore (
 INSERT INTO public.chore (name, location_in_house, frequency, duration_mins, priority, due_date)
 VALUES 
     ('Mop floors', 'Living Room', 'weekly', 30, 3, '2024-11-01'),
-    ('Wash dishes', 'Kitchen', 'daily', 10, 2, '2024-10-28');
+    ('Wash dishes', 'Kitchen', 'daily', 10, 2, '2024-10-28'), 
+    ('Vacuum', 'Living Room', 'weekly', 10, 4, '2024-10-5'),
+    ('Clean Kitchen', 'Kitchen', 'monthly', 30, 3, '2024-10-12');
 
 create table
   public.roommate (
@@ -28,6 +30,13 @@ create table
     email text null,
     constraint roommate_pkey primary key (id)
   ) tablespace pg_default;
+
+-- Insert pre-populated data into the roommate table
+INSERT INTO public.roommate (id,first_name, last_name, email)
+VALUES 
+    (100, 'Sarah', 'LeGoat', 'sarah@gmail.com'),
+    (101, 'Billy', 'LeGoat', 'billy@gmail.com'),
+    (102, 'Jake', 'LeGoat', 'jake@gmail.com');
 
 create table
   public.chore_assignment (
