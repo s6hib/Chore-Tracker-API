@@ -9,7 +9,7 @@ from src.api.roommate import Roommate
 from typing import List, Optional
 
 router = APIRouter(
-    prefix="/bill",
+    prefix="",
     tags=["bill"],
     dependencies=[Depends(auth.get_api_key)],
 )
@@ -64,7 +64,7 @@ def create_bill(bill_to_assign: Bill):
     }   
 
 
-@router.get("/bills/", tags=["bill"])
+@router.get("/get_bill/", tags=["bill"])
 def get_bill():
     with db.engine.begin() as connection:
        result = connection.execute(sqlalchemy.text(
@@ -99,7 +99,7 @@ class PaymentUpdate(BaseModel):
     roommate_id: int
     status: StatusEnum
 
-@router.patch("/bills/{bill_id}/payments", tags=["bill"])
+@router.patch("/update_bill_status/{bill_id}/payment", tags=["bill"])
 def update_bill_status(bill_id: int, payment_update: PaymentUpdate):
     with db.engine.begin() as connection:     
        result = connection.execute(sqlalchemy.text(
@@ -125,7 +125,7 @@ class BillUpdate(BaseModel):
     bill_type: Optional[BillTypeEnum] = None
     message: Optional[str] = None
 
-@router.patch("/bills/{bill_id}", tags=["bill"])
+@router.patch("/update_bills/{bill_id}", tags=["bill"])
 def update_bill(bill_id: int, bill_update: BillUpdate):
     update_fields = {}
     sql_set_clause = []
