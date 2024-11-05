@@ -35,30 +35,15 @@ curl -X 'GET' \
 
 Assign Chores:
 curl -X 'POST' \
- 'http://127.0.0.1:3000/assign_chore/assign_chore/' \
- -H 'accept: application/json' \
- -H 'access_token: a' \
- -H 'Content-Type: application/json' \
- -d '{
-"chore_to_assign": {
-"name": "wash dishes",
-"location_in_house": "kitchen",
-"frequency": "daily",
-"duration_mins": 20,
-"priority": 5,
-"due_date": "2024-10-27"
-},
-"roommate_to_assign": {
-"first_name": "Billy",
-"last_name": "Bob",
-"email": "billybob@gmail.com"
-}
-}'
+  'http://127.0.0.1:8000/chores/assign_chore/?chore_id=1&roommate_id=1' \
+  -H 'accept: application/json' \
+  -H 'access_token: a' \
+  -d ''
 
 {
-"chore_id": 2,
-"roommate": 3,
-"status": "pending"
+  "chore_id": 2,
+  "roommate_id": 3,
+  "status": "pending"
 }
 
 curl -X 'POST' \

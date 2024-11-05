@@ -49,29 +49,13 @@ curl -X 'POST' \
 
 Assign Chore
 curl -X 'POST' \
-  'https://chore-tracker-api.onrender.com/assign_chore/' \
+  'http://127.0.0.1:8000/chores/assign_chore/?chore_id=1&roommate_id=1' \
   -H 'accept: application/json' \
   -H 'access_token: a' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "chore_to_assign": {
-    "name": "take out trash",
-    "location_in_house": "kitchen",
-    "frequency": "daily",
-    "duration_mins": 5,
-    "priority": 1,
-    "due_date": "2024-11-07"
-  },
-  "roommate_to_assign": {
-    "first_name": "Lisa",
-    "last_name": "Smith",
-    "email": "Lsmith@gmail.com"
-  }
-}'
-
+  -d ''
 {
   "chore_id": 3,
-  "roommate": 10,
+  "roommate_id": 10,
   "status": "pending"
 }
 
