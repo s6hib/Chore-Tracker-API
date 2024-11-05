@@ -1,6 +1,6 @@
 workflow 2. Sarah Tracks Roommate Productivity and Adds Lisa
 
-Sarah wants to see how her roommates have managed their chores over the past month. She calls GET /chores/history with a date range covering the last 30 days. The API responds with a list of completed chores, including the title, the person who completed it, and the date of completion. Sarah notices that Jake vacuumed the living room on the 5th, and Billy cleaned the kitchen on the 12th.
+Sarah wants to see how her roommates have managed their chores over the past month. She calls GET /chores/history with a date range covering the last 30 days. The API responds with a list of completed chores, including the title, the person who completed it, and the date of completion. Sarah notices that Sue mopped the floors on the 27th, and Antony washed dished on the 27th.
 
 To help share the workload, Sarah adds a new roommate, Lisa. She calls POST /roommates with Lisa’s first name, last name, and an initial chore assignment: "Take out trash." The system creates Lisa’s profile, and she’s now part of the household chore management.
 
@@ -34,8 +34,6 @@ curl -X 'GET' \
     "completion_date": "2024-10-27"
   }
 ]
-
-MAYBE CHANGE TO CORRECT FLOW NAMES
 
 Create Roommate
 curl -X 'POST' \
@@ -71,7 +69,29 @@ curl -X 'POST' \
   }
 }'
 
-DO ONE MORE FOR CREATE CHORE
+Create Chore
+curl -X 'POST' \
+  'https://chore-tracker-api.onrender.com/assign_chore/' \
+  -H 'accept: application/json' \
+  -H 'access_token: a' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "chore_to_assign": {
+    "name": "Clean the bathroom",
+    "location_in_house": "bathroom",
+    "frequency": "weekly",
+    "duration_mins": 20,
+    "priority": 5,
+    "due_date": "2024-11-09"
+  },
+  "roommate_to_assign": {
+    "first_name": "Lisa",
+    "last_name": "Smith",
+    "email": "Lsmith@gmail.com"
+  }
+}'
+NOT WORKING GIVES ERROR DOESNT CREATE CHORE
+
 
 workflow 3. Mia Manages Shared Expenses and Creates a Bill
 
@@ -95,10 +115,8 @@ curl -X 'POST' \
   "cost": 120,
   "due_date": "2024-11-31",
   "bill_type": "electricity",
-  "message": "make sure to pay by 11/31"
+  "message": "important!"
 }'
-
-BILL DID NOT GET CREATED, (does not show up in table)
 
 GET Bills
 curl -X 'GET' \
@@ -108,44 +126,51 @@ curl -X 'GET' \
   
 [
   {
-    "cost": 1000,
-    "due_date": "2024-11-06T00:00:00+00:00",
-    "bill_type": "rent",
-    "message": "string",
+    "cost": 120,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "important!",
     "roommate_id": 1,
     "roommate_name": "Antony LeGoat",
     "status": "unpaid"
   },
   {
-    "cost": 1000,
-    "due_date": "2024-11-06T00:00:00+00:00",
-    "bill_type": "rent",
-    "message": "string",
+    "cost": 120,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "important!",
+    "roommate_id": 2,
+    "roommate_name": "sue sue",
+    "status": "unpaid"
+  },
+  {
+    "cost": 120,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "important!",
     "roommate_id": 3,
     "roommate_name": "Billy Bob",
     "status": "unpaid"
   },
   {
-    "cost": 1000,
-    "due_date": "2024-11-06T00:00:00+00:00",
-    "bill_type": "rent",
-    "message": "string",
+    "cost": 120,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "important!",
     "roommate_id": 4,
     "roommate_name": "Lisa Olander",
     "status": "unpaid"
   },
   {
-    "cost": 1000,
-    "due_date": "2024-11-06T00:00:00+00:00",
-    "bill_type": "rent",
-    "message": "string",
-    "roommate_id": 2,
-    "roommate_name": "sue sue",
-    "status": "paid"
+    "cost": 120,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "important!",
+    "roommate_id": 10,
+    "roommate_name": "Lisa Smith",
+    "status": "unpaid"
   }
 ]
-
-ONLY STUFF FOR RENT BILL SHOWED UP
 
 UPDATE Bill Status
 curl -X 'PATCH' \
@@ -159,10 +184,8 @@ curl -X 'PATCH' \
 }'
 
 {
-  "message": "Payment status for roommate 1 on bill 2 updated to paid."
+  "message": "Payment status for roommate 1 on bill 4 updated to paid."
 }
-
-DID A DIFFERENT BILL AND ROOMMATE THAN ALICE
 
 UPDATE BILL
 curl -X 'PATCH' \
@@ -172,13 +195,11 @@ curl -X 'PATCH' \
   -H 'Content-Type: application/json' \
   -d '{
   "due_date": "2024-12-01",
-  "cost": 1000,
-  "bill_type": "rent",
+  "cost": 120,
+  "bill_type": "electricity",
   "message": "pay by updated due date"
 }'
 
 {
-  "message": "Bill ID: 2 is updated successfully."
+  "message": "Bill ID: 4 is updated successfully."
 }
-
-UPDATED RENT BILL
