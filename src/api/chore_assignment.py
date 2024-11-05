@@ -40,6 +40,24 @@ def assign_chore(chore_id: int, roommate_id: int):
         if not roommate_exists:
             raise HTTPException(status_code=404, detail="Roommate not found")
 
+        # Check if this assignment already exists
+        existing_assignment = connection.execute(sqlalchemy.text(
+            """
+            SELECT 1 
+            FROM chore_assignment 
+            WHERE chore_id = :chore_id AND roommate_id = :roommate_id
+            """
+        ), {
+            "chore_id": chore_id,
+            "roommate_id": roommate_id
+        }).fetchone()
+        
+        if existing_assignment:
+            raise HTTPException(
+                status_code=400, 
+                detail="This chore assignment already exists for the specified roommate."
+            )
+        
         # If both exist, proceed to insert the chore assignment
         connection.execute(sqlalchemy.text(
             """
@@ -80,4 +98,5 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
         "message": "Chore status updated successfully!", 
         "chore_id" : chore_id, 
         "roommate_id": roommate_id, 
-        "new_status": status_update.status }
+        "new_status": status_update.status 
+    }
