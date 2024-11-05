@@ -135,7 +135,7 @@ class BillUpdate(BaseModel):
             }
         }
 
-@router.patch("/update_bills/{bill_id}", tags=["bill"], response_model=dict)
+@router.patch("/update_bill/{bill_id}", tags=["bill"], response_model=dict)
 def update_bill(bill_id: int, bill_update: BillUpdate):
     update_fields = {}
     sql_set_clause = []
