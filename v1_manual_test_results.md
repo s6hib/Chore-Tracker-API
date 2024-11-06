@@ -38,7 +38,7 @@ curl -X 'GET' \
 
 Get All Chores: 
 curl -X 'GET' \
-  'http://127.0.0.1:8000/chores/get_chore' \
+  'https://chore-tracker-api.onrender.com/chores/get_chore?priority=5' \
   -H 'accept: application/json' \
   -H 'access_token: a'
 
@@ -97,7 +97,7 @@ Step 2: Billy decides to assign both chores to himself. He calls POST /chores/as
 
 Assign Chores:
 curl -X 'POST' \
-  'http://127.0.0.1:8000/chores/assign_chore/?chore_id=1&roommate_id=1' \
+  'https://chore-tracker-api.onrender.com/chores/assign_chore/?chore_id=2&roommate_id=3' \
   -H 'accept: application/json' \
   -H 'access_token: a' \
   -d ''
@@ -112,19 +112,19 @@ Step 3: After washing the dishes, Billy goes back to the chore tracker to mark t
 Update chore status:
 
 curl -X 'PATCH' \
-  'http://127.0.0.1:8000/chores/2/assignments/3/status' \
+  'https://chore-tracker-api.onrender.com/chores/2/assignments/3/status' \
   -H 'accept: application/json' \
   -H 'access_token: a' \
   -H 'Content-Type: application/json' \
   -d '{
-  "status": "pending"
-}' 
+  "status": "completed"
+}'
 
 {
   "message": "Chore status updated successfully!",
   "chore_id": 2,
   "roommate_id": 3,
-  "new_status": "pending"
+  "new_status": "completed"
 }
 
 Now, Billy’s roommates can see that he has washed the dishes, and he’ll get to mopping the floors later.
