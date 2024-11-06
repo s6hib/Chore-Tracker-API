@@ -80,7 +80,7 @@ def create_bill(bill_to_assign: Bill):
 def get_bill():
     with db.engine.begin() as connection:
        result = connection.execute(sqlalchemy.text(
-            '''SELECT cost, due_date, bill_type, message,
+            '''SELECT cost AS total_cost, due_date, bill_type, message,
             b.roommate_id, b.status, (r.first_name || ' ' || r.last_name) AS fullname
             FROM bill 
             JOIN bill_list b ON b.bill_id = bill.id
@@ -90,7 +90,7 @@ def get_bill():
 
     for bill in result:
         bill_list.append({
-            "cost": bill.cost,
+            "total_cost": bill.total_cost,
             "due_date": bill.due_date,
             "bill_type": bill.bill_type,
             "message": bill.message,
@@ -101,6 +101,34 @@ def get_bill():
         print(bill)
 
     return bill_list
+
+@router.get("/{bill_id}/assignments", tags=["bill"])
+def get_bill_assignments(bill_id: int):
+    with db.engine.begin() as connection:
+        # Query all assignments for the specified bill_id
+        result = connection.execute(sqlalchemy.text(
+            """
+            SELECT roommate_id, status, amount
+            FROM bill_list
+            WHERE bill_id = :bill_id
+            """
+        ), {"bill_id": bill_id}).fetchall()
+
+        # If no assignments are found, return an error
+        if not result:
+            raise HTTPException(status_code=404, detail="No assignments found for this bill.")
+
+    # Format the result as a list of dictionaries
+    bill_assignments = [
+        {
+            "roommate_id": row.roommate_id,
+            "status": row.status,
+            "amount": row.amount
+        }
+        for row in result
+    ]
+    
+    return {"bill_id": bill_id, "assignments": bill_assignments}
 
 class StatusEnum(str, Enum):
     unpaid = 'unpaid'
