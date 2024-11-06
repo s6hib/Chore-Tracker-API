@@ -194,24 +194,23 @@ total_cost": 130,
 }
 ]
 
-Step 3: A few days later, Alice pays her share. Sue updates the payment status by calling PATCH /bills/1/payments and marking Antony's portion as paid. The API confirms the update with a success message.
+Step 3: A few days later, Antony pays her share. Sue updates the payment status by calling PATCH /bills/update_bill_list_status/2/payment/1 and marking Antony's portion as paid. The API confirms the update with a success message.
 
-UPDATE Bill Status
+UPDATE Bill List Status
 curl -X 'PATCH' \
- 'https://chore-tracker-api.onrender.com/update_bill_status/2/payment' \
+ 'https://chore-tracker-api.onrender.com/update_bill_list_status/2/payment/1' \
  -H 'accept: application/json' \
  -H 'access_token: a' \
  -H 'Content-Type: application/json' \
  -d '{
-"roommate_id": 1,
 "status": "paid"
 }'
 
 {
-"message": "Payment status for roommate 1 on bill 4 updated to paid."
+"message": "Payment status for roommate 3 on bill 2 updated to paid."
 }
 
-Step 4: Later, Bob tells Sue he needs more time to pay. Sue updates the due date by calling PATCH /bills/1 to extend the deadline. The API responds with a confirmation that the due date was successfully updated.
+Step 4: Later, Bob tells Sue the bill type is wrong. It should be gas. Sue updates the bill type by calling PATCH /bills/update_bill/3 to change the bill type. The API responds with a confirmation that the change was successfully updated.
 
 UPDATE BILL
 curl -X 'PATCH' \
@@ -221,13 +220,12 @@ curl -X 'PATCH' \
  -H 'Content-Type: application/json' \
  -d '{
 "due_date": "2024-12-01",
-"cost": 120,
-"bill_type": "electricity",
+"bill_type": "gas",
 "message": "pay by updated due date"
 }'
 
 {
-"message": "Bill ID: 4 is updated successfully."
+"message": "Bill ID: 2 is updated successfully."
 }
 
 With the chore tracker, Sue stays on top of household expenses, ensuring everyone pays their share and the financial burden is managed fairly.

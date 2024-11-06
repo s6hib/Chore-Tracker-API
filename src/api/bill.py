@@ -136,32 +136,32 @@ class StatusEnum(str, Enum):
     overdue = 'overdue'
 
 class PaymentUpdate(BaseModel):
-    roommate_id: int
     status: StatusEnum
 
-@router.patch("/update_bill_status/{bill_id}/payment", tags=["bill"])
-def update_bill_status(bill_id: int, payment_update: PaymentUpdate):
+@router.patch("/update_bill_status/{bill_id}/payment/{roommate_id}", tags=["bill"])
+def update_bill_list_status(bill_id: int, roommate_id: int, payment_update: PaymentUpdate):
     with db.engine.begin() as connection:     
        result = connection.execute(sqlalchemy.text(
            """
             UPDATE bill_list
-            SET status =:status
+            SET status =:status,
+                amount = CASE WHEN :status = 'paid' THEN 0 ELSE amount END
             WHERE bill_id = :bill_id AND roommate_id = :roommate_id
             """
 
       ), {
           "bill_id" : bill_id, 
-          "roommate_id" : payment_update.roommate_id,
+          "roommate_id" : roommate_id,
           "status" : payment_update.status.value
         })
        if result.rowcount == 0:
            return {"message": "No bill found with the specified ID."}
 
-    return {"message": f"Payment status for roommate {payment_update.roommate_id} on bill {bill_id} updated to {payment_update.status.value}."}
+    return {"message": f"Payment status for roommate id {roommate_id} on bill id {bill_id} updated to {payment_update.status.value}."}
 
 class BillUpdate(BaseModel):
     due_date: Optional[datetime.date] = Field(None, example="YYYY-MM-DD")  # Placeholder for date
-    cost: Optional[float] = Field(None, example=0.0)  # Placeholder for a cost value
+    #cost: Optional[float] = Field(None, example=0.0)  # Placeholder for a cost value
     bill_type: Optional[BillTypeEnum] = Field(None, example="string")  # Placeholder for Enum
     message: Optional[str] = Field(None, example="string")  # Placeholder for a message
 
@@ -169,7 +169,7 @@ class BillUpdate(BaseModel):
         schema_extra = {
             "example": {
                 "due_date": "2024-12-31",      # Example date format
-                "cost": 0.0,                 # Example cost
+                #"cost": 0.0,                 # Example cost
                 "bill_type": "string",         # Placeholder to show it’s a string field
                 "message": "string"            # Placeholder for a generic text field
             }
@@ -184,9 +184,9 @@ def update_bill(bill_id: int, bill_update: BillUpdate):
         sql_set_clause.append("due_date =:due_date")
         update_fields["due_date"] = bill_update.due_date
 
-    if bill_update.cost is not None:
-        sql_set_clause.append("cost =:cost")
-        update_fields["cost"] = bill_update.cost
+    # if bill_update.cost is not None:
+    #     sql_set_clause.append("cost =:cost")
+    #     update_fields["cost"] = bill_update.cost
     
     if bill_update.bill_type is not None:
         sql_set_clause.append("bill_type = :bill_type")
