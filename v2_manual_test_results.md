@@ -115,7 +115,7 @@ curl -X 'POST' \
 **Response:**
 ```json
 {
-  "bill_id": 7,
+  "bill_id": 2,
   "message": "Bill created and assigned to roommates."
 }
 ```
@@ -134,7 +134,7 @@ curl -X 'GET' \
 **Response:**
 ```json
 {
-  "bill_id": 7,
+  "bill_id": 2,
   "assignments": [
     {
       "roommate_id": 1,
@@ -262,7 +262,7 @@ curl -X 'PATCH' \
  -d '{
        "due_date": "2024-12-01",
        "bill_type": "gas",
-       "message": "pay by updated due date"
+       "message": "pay by due date"
      }'
 ```
 
