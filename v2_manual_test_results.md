@@ -1,231 +1,276 @@
-workflow 2. Sarah Tracks Roommate Productivity and Adds Lisa
+# Workflow 2: Sarah Tracks Roommate Productivity and Adds Lisa
 
-Step 1: Sarah wants to see how her roommates have managed their chores over the past month. She calls GET /chores/history with a date range covering the last 30 days. The API responds with a list of completed chores, including the title, the person who completed it, and the date of completion. Sarah notices that Sue mopped the floors on the 27th, and Antony washed dished on the 27th.
+### Step 1: Retrieve Chore History
+Sarah wants to see how her roommates managed their chores over the past month. She calls the `GET /chores/history` endpoint with a date range covering the last 30 days. The API responds with a list of completed chores, including the title, the person who completed it, and the date of completion.
 
-GET Chore History
+**GET Chore History Request:**
+```bash
 curl -X 'GET' \
  'https://chore-tracker-api.onrender.com/history' \
  -H 'accept: application/json' \
  -H 'access_token: a'
+```
 
+**Response:**
+```json
 [
-{
-"title": "mop floors",
-"completed_by": "sue sue",
-"completion_date": "2024-10-27"
-},
-{
-"title": "mop floors",
-"completed_by": "sue sue",
-"completion_date": "2024-10-27"
-},
-{
-"title": "mop floors",
-"completed_by": "sue sue",
-"completion_date": "2024-10-27"
-},
-{
-"title": "wash dishes",
-"completed_by": "Antony LeGoat",
-"completion_date": "2024-10-27"
-}
+  {
+    "title": "mop floors",
+    "completed_by": "Sue Sue",
+    "completion_date": "2024-10-27"
+  },
+  {
+    "title": "wash dishes",
+    "completed_by": "Antony LeGoat",
+    "completion_date": "2024-10-27"
+  }
 ]
+```
 
-Step 2: To help share the workload, Sarah adds a new roommate, Lisa. She calls POST /roommates with Lisa’s first name, last name, and an initial chore assignment: "Take out trash." The system creates Lisa’s profile, and she’s now part of the household chore management.
+### Step 2: Add a New Roommate
+To help share the workload, Sarah adds a new roommate, Lisa, with an initial chore assignment of "Take out trash." She calls the `POST /roommates` endpoint with Lisa's details.
 
-Create Roommate
+**Create Roommate Request:**
+```bash
 curl -X 'POST' \
  'https://chore-tracker-api.onrender.com/create_roommates/' \
  -H 'accept: application/json' \
  -H 'access_token: a' \
  -H 'Content-Type: application/json' \
  -d '{
-"first_name": "Lisa",
-"last_name": "Smith",
-"email": "Lsmith@gmail.com"
-}'
+       "first_name": "Lisa",
+       "last_name": "Smith",
+       "email": "Lsmith@gmail.com"
+     }'
+```
 
-Step 3: After adding Lisa, Sarah realises the bathroom needs immediate attention. She creates a new chore by calling POST /chores with the title "Clean the bathroom," setting a high priority, assigning it to Lisa, and adding a due date for the upcoming weekend. The API responds with "Chore created and assigned to Lisa successfully."
+### Step 3: Assign a New Chore
+Sarah creates a new chore, "Clean the bathroom," assigning it to Lisa with a high priority and a due date for the upcoming weekend.
 
-Create Chore
+**Create Chore Request:**
+```bash
 curl -X 'POST' \
  'https://chore-tracker-api.onrender.com/chores/create_chore' \
  -H 'accept: application/json' \
  -H 'access_token: a' \
  -H 'Content-Type: application/json' \
  -d '{
-"name": "Clean the bathroom",
-"location_in_house": "bathroom",
-"frequency": "weekly",
-"duration_mins": 20,
-"priority": 5,
-"due_date": "2024-11-09"
-}'
+       "name": "Clean the bathroom",
+       "location_in_house": "bathroom",
+       "frequency": "weekly",
+       "duration_mins": 20,
+       "priority": 5,
+       "due_date": "2024-11-09"
+     }'
+```
 
+**Response:**
+```json
 {
-"message": "Chore Clean the bathroom created successully.",
-"chore_id": 9
+  "message": "Chore 'Clean the bathroom' created successfully.",
+  "chore_id": 9
 }
+```
 
-Assign Chore
+**Assign Chore Request:**
+```bash
 curl -X 'POST' \
  'https://chore-tracker-api.onrender.com/chores/assign_chore/?chore_id=9&roommate_id=10' \
  -H 'accept: application/json' \
  -H 'access_token: a' \
  -d ''
+```
+
+**Response:**
+```json
 {
-"chore_id": 9,
-"roommate_id": 10,
-"status": "pending"
+  "chore_id": 9,
+  "roommate_id": 10,
+  "status": "pending"
 }
+```
 
-workflow 3. Sue Manages Shared Expenses and Creates a Bill
+---
 
-Step 1: Sue needs to split the recent electricity bill among her roommates. She calls POST /bills with the total amount of $130 and includes all the roommate IDs in the house. She sets the due date for the bill at the end of the month. The API confirms the bill was created successfully.
+# Workflow 3: Sue Manages Shared Expenses and Creates a Bill
 
-Create Bill
+### Step 1: Create a New Bill
+Sue needs to split the recent electricity bill among her roommates. She calls `POST /bills` with the total amount of $130, the due date, and includes all roommate IDs.
+
+**Create Bill Request:**
+```bash
 curl -X 'POST' \
  'https://chore-tracker-api.onrender.com/bills/create_bill' \
  -H 'accept: application/json' \
  -H 'access_token: a' \
  -H 'Content-Type: application/json' \
  -d '{
-"cost": 130,
-"due_date": "2024-11-06",
-"bill_type": "electricity",
-"message": "pay for oct electricity!"
-}'
+       "cost": 130,
+       "due_date": "2024-11-06",
+       "bill_type": "electricity",
+       "message": "pay for Oct electricity!"
+     }'
+```
 
+**Response:**
+```json
 {
-"bill_id": 7,
-"message": "Bill created and assigned to roommates."
+  "bill_id": 7,
+  "message": "Bill created and assigned to roommates."
 }
+```
 
-Step 2: To verify everything is recorded, Sue calls GET /bills and sees the new electricity bill, showing that each roommate needs to pay the bill evenly.
+### Step 2: Retrieve Bill Assignments
+Sue calls `GET /bills` to see the new electricity bill and verify each roommate's payment amount.
 
-GET Bills with specific bill_id
+**GET Bill Assignments Request:**
+```bash
 curl -X 'GET' \
  'https://chore-tracker-api.onrender.com/bills/7/assignments' \
  -H 'accept: application/json' \
  -H 'access_token: a'
+```
 
+**Response:**
+```json
 {
-"bill_id": 7,
-"assignments": [
-{
-"roommate_id": 1,
-"status": "unpaid",
-"amount": 26
-},
-{
-"roommate_id": 2,
-"status": "unpaid",
-"amount": 26
-},
-{
-"roommate_id": 3,
-"status": "unpaid",
-"amount": 26
-},
-{
-"roommate_id": 4,
-"status": "unpaid",
-"amount": 26
-},
-{
-"roommate_id": 10,
-"status": "unpaid",
-"amount": 26
+  "bill_id": 7,
+  "assignments": [
+    {
+      "roommate_id": 1,
+      "status": "unpaid",
+      "amount": 26
+    },
+    {
+      "roommate_id": 2,
+      "status": "unpaid",
+      "amount": 26
+    },
+    {
+      "roommate_id": 3,
+      "status": "unpaid",
+      "amount": 26
+    },
+    {
+      "roommate_id": 4,
+      "status": "unpaid",
+      "amount": 26
+    },
+    {
+      "roommate_id": 10,
+      "status": "unpaid",
+      "amount": 26
+    }
+  ]
 }
-]
-}
+```
 
-GET All Bills
+### Step 3: Retrieve All Bills
+Sue retrieves all bills to confirm details like the due date and total cost.
+
+**GET All Bills Request:**
+```bash
 curl -X 'GET' \
  'https://chore-tracker-api.onrender.com/bills/get_bill' \
  -H 'accept: application/json' \
  -H 'access_token: a'
+```
 
+**Response:**
+```json
 [
-{
-"total_cost": 130,
-"due_date": "2024-11-05T00:00:00+00:00",
-"bill_type": "electricity",
-"message": "pay for oct electricity!",
-"roommate_id": 1,
-"roommate_name": "Antony LeGoat",
-"status": "unpaid"
-},
-{
-total_cost": 130,
-"due_date": "2024-11-05T00:00:00+00:00",
-"bill_type": "electricity",
-"message": "pay for oct electricity!",
-"roommate_id": 2,
-"roommate_name": "sue sue",
-"status": "unpaid"
-},
-{
-total_cost": 130,
-"due_date": "2024-11-05T00:00:00+00:00",
-"bill_type": "electricity",
-"message": "pay for oct electricity!",
-"roommate_id": 3,
-"roommate_name": "Billy Bob",
-"status": "unpaid"
-},
-{
-total_cost": 130,
-"due_date": "2024-11-05T00:00:00+00:00",
-"bill_type": "electricity",
-"message": "pay for oct electricity!",
-"roommate_id": 4,
-"roommate_name": "Lisa Olander",
-"status": "unpaid"
-},
-{
-total_cost": 130,
-"due_date": "2024-11-05T00:00:00+00:00",
-"bill_type": "electricity",
-"message": "pay for oct electricity!",
-"roommate_id": 10,
-"roommate_name": "Lisa Smith",
-"status": "unpaid"
-}
+  {
+    "total_cost": 130,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "pay for Oct electricity!",
+    "roommate_id": 1,
+    "roommate_name": "Antony LeGoat",
+    "status": "unpaid"
+  },
+  {
+    "total_cost": 130,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "pay for Oct electricity!",
+    "roommate_id": 2,
+    "roommate_name": "Sue Sue",
+    "status": "unpaid"
+  },
+  {
+    "total_cost": 130,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "pay for Oct electricity!",
+    "roommate_id": 3,
+    "roommate_name": "Billy Bob",
+    "status": "unpaid"
+  },
+  {
+    "total_cost": 130,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "pay for Oct electricity!",
+    "roommate_id": 4,
+    "roommate_name": "Lisa Olander",
+    "status": "unpaid"
+  },
+  {
+    "total_cost": 130,
+    "due_date": "2024-11-05T00:00:00+00:00",
+    "bill_type": "electricity",
+    "message": "pay for Oct electricity!",
+    "roommate_id": 10,
+    "roommate_name": "Lisa Smith",
+    "status": "unpaid"
+  }
 ]
+```
 
-Step 3: A few days later, Antony pays her share. Sue updates the payment status by calling PATCH /bills/update_bill_list_status/2/payment/1 and marking Antony's portion as paid. The API confirms the update with a success message.
+### Step 4: Update Payment Status
+A few days later, Antony pays his share. Sue updates his payment status by calling `PATCH /bills/update_bill_list_status/2/payment/1`.
 
-UPDATE Bill List Status
+**Update Payment Status Request:**
+```bash
 curl -X 'PATCH' \
  'https://chore-tracker-api.onrender.com/update_bill_list_status/2/payment/1' \
  -H 'accept: application/json' \
  -H 'access_token: a' \
  -H 'Content-Type: application/json' \
  -d '{
-"status": "paid"
-}'
+       "status": "paid"
+     }'
+```
 
+**Response:**
+```json
 {
-"message": "Payment status for roommate 3 on bill 2 updated to paid."
+  "message": "Payment status for roommate 3 on bill 2 updated to paid."
 }
+```
 
-Step 4: Later, Bob tells Sue the bill type is wrong. It should be gas. Sue updates the bill type by calling PATCH /bills/update_bill/3 to change the bill type. The API responds with a confirmation that the change was successfully updated.
+### Step 5: Update Bill Type
+Later, Sue realizes the bill type is incorrect and changes it from electricity to gas.
 
-UPDATE BILL
+**Update Bill Type Request:**
+```bash
 curl -X 'PATCH' \
  'https://chore-tracker-api.onrender.com/update_bills/2' \
  -H 'accept: application/json' \
  -H 'access_token: a' \
  -H 'Content-Type: application/json' \
  -d '{
-"due_date": "2024-12-01",
-"bill_type": "gas",
-"message": "pay by updated due date"
-}'
+       "due_date": "2024-12-01",
+       "bill_type": "gas",
+       "message": "pay by updated due date"
+     }'
+```
 
+**Response:**
+```json
 {
-"message": "Bill ID: 2 is updated successfully."
+  "message": "Bill ID: 2 is updated successfully."
 }
+```
 
-With the chore tracker, Sue stays on top of household expenses, ensuring everyone pays their share and the financial burden is managed fairly.
+With this chore and expense tracker, Sue efficiently manages household responsibilities, ensuring fair expense distribution and tracking of chore assignments.
