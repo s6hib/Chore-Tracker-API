@@ -101,7 +101,7 @@ curl -X 'POST' \
 "message": "Bill created and assigned to roommates."
 }
 
-Step 2: To verify everything is recorded, Mia calls GET /bills and sees the new electricity bill, showing that each roommate needs to pay the bill evenly.
+Step 2: To verify everything is recorded, Sue calls GET /bills and sees the new electricity bill, showing that each roommate needs to pay the bill evenly.
 
 GET Bills with specific bill_id
 curl -X 'GET' \
@@ -194,7 +194,7 @@ total_cost": 130,
 }
 ]
 
-Step 3: A few days later, Alice pays her share. Mia updates the payment status by calling PATCH /bills/1/payments and marking Alice’s portion as paid. The API confirms the update with a success message.
+Step 3: A few days later, Alice pays her share. Sue updates the payment status by calling PATCH /bills/1/payments and marking Antony's portion as paid. The API confirms the update with a success message.
 
 UPDATE Bill Status
 curl -X 'PATCH' \
@@ -211,7 +211,7 @@ curl -X 'PATCH' \
 "message": "Payment status for roommate 1 on bill 4 updated to paid."
 }
 
-Step 4: Later, Bob tells Mia he needs more time to pay. Mia updates the due date by calling PATCH /bills/1 to extend the deadline. The API responds with a confirmation that the due date was successfully updated.
+Step 4: Later, Bob tells Sue he needs more time to pay. Sue updates the due date by calling PATCH /bills/1 to extend the deadline. The API responds with a confirmation that the due date was successfully updated.
 
 UPDATE BILL
 curl -X 'PATCH' \
@@ -230,4 +230,4 @@ curl -X 'PATCH' \
 "message": "Bill ID: 4 is updated successfully."
 }
 
-With the chore tracker, Mia stays on top of household expenses, ensuring everyone pays their share and the financial burden is managed fairly.
+With the chore tracker, Sue stays on top of household expenses, ensuring everyone pays their share and the financial burden is managed fairly.
