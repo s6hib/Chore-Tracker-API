@@ -25,6 +25,7 @@ VALUES
     ('Wash dishes', 'Kitchen', 'daily', 10, 2, '2024-10-28'), 
     ('Vacuum', 'Living Room', 'weekly', 10, 4, '2024-10-5'),
     ('Clean Kitchen', 'Kitchen', 'monthly', 30, 3, '2024-10-12');
+ON CONFLICT DO NOTHING;  -- Avoid duplicates if re-run
 
 create table
   public.roommate (
@@ -41,6 +42,7 @@ VALUES
     (100, 'Sarah', 'LeGoat', 'sarah@gmail.com'),
     (101, 'Billy', 'LeGoat', 'billy@gmail.com'),
     (102, 'Jake', 'LeGoat', 'jake@gmail.com');
+ON CONFLICT DO NOTHING;  -- Avoid duplicates if re-run
 
 create table
   public.chore_assignment (
@@ -75,6 +77,14 @@ create table
     message text null,
     constraint bill_pkey primary key (id)
   ) tablespace pg_default;
+
+-- Pre-populate the bill table with initial data
+INSERT INTO bill (cost, due_date, bill_type, message) 
+VALUES
+  (100, '2024-11-06', 'electricity', 'pay up'),
+  (1000, '2024-12-01', 'rent', 'pay by updated due date'),
+  (300, '2024-11-05', 'internet', 'to pay')
+ON CONFLICT DO NOTHING;  -- Avoid duplicates if re-run
 
 create TYPE status_enum AS ENUM('unpaid', 'paid', 'overdue');
 
