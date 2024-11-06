@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import HTTPException, APIRouter, Depends
 from pydantic import BaseModel, Field
 from src.api import auth
 import datetime
