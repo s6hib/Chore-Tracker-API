@@ -42,7 +42,7 @@ curl -X 'GET' \
   -H 'accept: application/json' \
   -H 'access_token: a'
 
-  [
+[
   {
     "name": "mop floors",
     "location_in_house": "All rooms",
