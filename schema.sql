@@ -84,6 +84,7 @@ create table
     bill_id bigint null,
     roommate_id bigint null,
     status public.status_enum null,
+    amount real not null default '0'::real,
     constraint bill_list_pkey primary key (id),
     constraint bill_list_bill_id_fkey foreign key (bill_id) references bill (id)
   ) tablespace pg_default;

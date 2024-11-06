@@ -48,14 +48,26 @@ def create_bill(bill_to_assign: Bill):
         )
         bill_id = add_bill_query.scalar_one()
 
+        roommates = connection.execute(sqlalchemy.text(
+            """
+            SELECT id FROM roommate
+            """
+        )).fetchall()
+
+        num_roommates = len(roommates)
+        if num_roommates == 0:
+            raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
+        cost_per_roommate = bill_to_assign.cost / num_roommates
+
         connection.execute(sqlalchemy.text(
             """
-            INSERT INTO bill_list (roommate_id, bill_id, status)
-            SELECT id, :bill_id, 'unpaid'
+            INSERT INTO bill_list (roommate_id, bill_id, status, amount)
+            SELECT id, :bill_id, 'unpaid', :cost_per_roommate
             FROM roommate
             """
         ),{
-            "bill_id": bill_id
+            "bill_id": bill_id,
+            "cost_per_roommate" : cost_per_roommate
         })
             
     return {
