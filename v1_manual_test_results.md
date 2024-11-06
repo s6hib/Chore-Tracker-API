@@ -5,7 +5,7 @@ Step 1: Billy has a light school schedule this week and decides to take on more 
 
 Get Chores with specific priority number:
 curl -X 'GET' \
-  'http://127.0.0.1:8000/chores/get_chore?priority=5' \
+  'https://chore-tracker-api.onrender.com/chores/get_chore?priority=5' \
   -H 'accept: application/json' \
   -H 'access_token: a'
 
@@ -38,7 +38,7 @@ curl -X 'GET' \
 
 Get All Chores: 
 curl -X 'GET' \
-  'https://chore-tracker-api.onrender.com/chores/get_chore?priority=5' \
+  'https://chore-tracker-api.onrender.com/chores/get_chore' \
   -H 'accept: application/json' \
   -H 'access_token: a'
 
