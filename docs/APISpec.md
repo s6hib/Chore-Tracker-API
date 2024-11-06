@@ -2,29 +2,30 @@
 
 ### 1. Create a Chore
 
-**Endpoint:** `POST /chores`
+**Endpoint:** `POST /create_chore`
 
-**Description:** Creates a new chore and assigns it to a roommate with optional priority, description, and due date.
+**Description:** Creates a new chore and assigns it to a roommate with priority, location, frequency, duration(mins) and due date.
 
 **Request Body:**
 
-- `title`: string  
+- **`name`**: *string* (required)  
   The name of the chore.
 
-- `description`: string (optional)
-  A detailed description of the chore.
+- **`location_in_house`**: *string* (required)  
+  The location within the house where the chore should be performed.
 
-- `priority`: integer (1–5) (optional) 
-  The priority level of the chore, where `1` is the lowest and `5` is the highest.
+- **`frequency`**: *enum* (required)  
+  The frequency of the chore, represented by an enumeration (e.g., "daily", "weekly").
 
-- `duration`: integer (minutes) (optional)
+- **`duration_mins`**: *integer* (required)  
   The estimated time required to complete the chore, expressed in minutes.
 
-- `due_date`: string (YYYY-MM-DD)  (optional)
-  The due date by which the chore should be completed.
+- **`priority`**: *integer* (required)  
+  The priority level of the chore, where `1` is the lowest and `5` is the highest. Must be an integer between 1 and 5.
 
-- `assignee_id`: integer (optional) 
-  The ID of the roommate assigned to this chore.
+- **`due_date`**: *string* (required)  
+  The due date by which the chore should be completed, formatted as `YYYY-MM-DD`.
+
 
 **Response:**
 
@@ -38,128 +39,99 @@
 
 ### 2. Get All Chores
 
-**Endpoint:** `GET /chores`
+**Endpoint:** `GET /get_chore`
 
-**Description:** Retrieves a list of all chores, with optional filters for status, priority, or assignee.
+**Description:** Retrieves a list of all chores, with an optional filter for priority.
 
 **Request (Query Parameters):**
 
-- `status`: string (optional)  
-  Filter chores based on their current status. Predefined values: `pending`, `in_progress`, `completed`. If not provided, chores of all statuses will be returned.
-
-- `assignee_name`: string (optional)  
-  Filter chores by the name of the assigned roommate. If provided, this will search based on the assignee's full name.
-
-- `assignee_id`: integer (optional)  
-  Filter chores by the `assignee_id` of the assigned roommate. If provided, this will search based on the ID of the assigned roommate.
-
-- `priority`: integer (1–5) (optional)  
+- **`priority`**: *integer* (1–5) (optional)  
   Filter chores based on their priority level. If not provided, chores of all priorities will be returned.
 
 If no query parameters are provided, all chores will be returned.
 
 **Response:**
 
-- `chores`: array of objects  
+- **`chores`**: *array of objects*  
   A list of chores that match the provided filters (if any).
-  - `id`: integer  
-    The unique identifier for the chore.
+  - **`name`**: *string*  
+    The name of the chore.
 
-  - `title`: string  
-    The title of the chore.
+  - **`location_in_house`**: *string*  
+    The location within the house where the chore should be performed.
 
-  - `description`: string  
-    A detailed description of the chore.
+  - **`frequency`**: *string*  
+    The frequency of the chore (e.g., "daily", "weekly").
 
-  - `priority`: integer  
+  - **`duration`**: *integer*  
+    The estimated time required to complete the chore, expressed in minutes.
+
+  - **`priority`**: *integer*  
     The priority level of the chore (1–5).
 
-  - `duration`: integer  
-    The estimated duration of the chore, expressed in minutes.
+  - **`due_date`**: *string*  
+    The due date of the chore in the format `YYYY-MM-DD`.
 
-  - `due_date`: string  
-    The due date of the chore (YYYY-MM-DD).
+---
+## 3. Get Chore History
 
-  - `status`: string  
-    The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
+**Endpoint:** `GET /history`
 
-  - `assignee_id`: integer  
-    The ID of the roommate assigned to the chore.
+**Description:** Retrieves a list of completed chores within the past 30 days, including details about who completed each chore and the completion date.
+
+### **Response:**
+
+- **`history`**: *array of objects*  
+  A list of completed chores within the past 30 days.
+
+  - **`title`**: *string*  
+    The name of the chore.
+
+  - **`completed_by`**: *string*  
+    The full name of the roommate who completed the chore, in the format "First Last".
+
+  - **`completion_date`**: *string*  
+    The date when the chore was completed, formatted as `YYYY-MM-DD`.
 
 ---
 
-### 3. Get Specific Chore
+### 4. Update Chore Assignment Status
 
-**Endpoint:** `GET /chores/{id}`
+**Endpoint:** `PATCH /{chore_id}/assignments/{roommate_id}/status`
 
-**Description:** Retrieves the details of a specific chore by its unique ID.
+**Description:** Updates the status of a specific chore assignment for a given roommate.
 
-**Request (Path Parameter):**
+**Request (Path Parameters):**
 
-- `id`: integer  
-  The unique identifier of the chore to be retrieved.
+- **`chore_id`**: *integer*  
+  The unique identifier of the chore.
 
-**Response:**
-
-- `id`: integer  
-  The unique identifier for the chore.
-- `title`: string  
-  The title of the chore.
-- `description`: string  
-  A detailed description of the chore.
-- `priority`: integer  
-  The priority level of the chore (1–5).
-- `duration`: integer  
-  The estimated time required to complete the chore, expressed in minutes.
-- `due_date`: string  
-  The due date by which the chore should be completed (YYYY-MM-DD).
-- `status`: string  
-  The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
-- `assignee_id`: integer  
-  The ID of the roommate assigned to the chore.
-- `comments`: array of objects  
-  A list of comments associated with the chore.
-  - `comment_text`: string  
-    The text of the comment.
-  - `commenter_id`: integer  
-    The ID of the roommate who made the comment.
-
----
-
-### 4. Update a Chore
-
-**Endpoint:** `PATCH /chores/{id}`
-
-**Description:** Updates specific fields of a chore. Supports partial updates.
-
-**Request (Path Parameter):**
-
-- `id`: integer  
-  The unique identifier of the chore to be updated.
+- **`roommate_id`**: *integer*  
+  The unique identifier of the roommate assigned to the chore.
 
 **Request Body:**
 
-The request body supports partial updates. You may include one or more of the following fields to update only specific attributes of the chore:
-
-- `title`: string  
-  The name of the chore.
-- `description`: string  
-  A detailed description of the chore.
-- `priority`: integer (1–5)  
-  The priority level of the chore, where `1` is the lowest and `5` is the highest.
-- `duration`: integer (minutes)  
-  The estimated time required to complete the chore, expressed in minutes.
-- `due_date`: string (YYYY-MM-DD)  
-  The due date by which the chore should be completed.
-- `status`: string  
-  The current status of the chore. Predefined values: `pending`, `in_progress`, `completed`.
+- **`status`**: *string*  
+  The new status of the chore assignment. Allowed values are `pending`, `in_progress`, or `completed`.
 
 **Response:**
 
-- `message`: string  
-  A confirmation message indicating the result of the update.
-- `updated_fields`: array of strings  
-  A list of the fields that were updated.
+- **`message`**: *string*  
+  A confirmation message indicating the status update was successful.
+
+- **`chore_id`**: *integer*  
+  The ID of the chore that was updated.
+
+- **`roommate_id`**: *integer*  
+  The ID of the roommate assigned to the chore.
+
+- **`new_status`**: *string*  
+  The updated status of the chore assignment.
+
+**Notes:**
+
+- This endpoint updates only the status of an existing chore assignment.
+- Ensure that `chore_id` and `roommate_id` correspond to an existing assignment to avoid errors.
 
 ---
 
@@ -212,99 +184,95 @@ The request body supports partial updates. You may include one or more of the fo
 
 ---
 
-### 7. Create a Roommate
+### 7. Create Roommate
 
-**Endpoint:** `POST /roommates`
+**Endpoint:** `POST /create_roommate`
 
-**Description:** Creates a new roommate in the system with optional assigned chores.
+**Description:** Creates a new roommate with the provided first name, last name, and email, and returns the details along with a unique roommate ID.
 
 **Request Body:**
 
-- `first_name`: string  
-  The first name of the roommate to be created.
-- `last_name`: string  
-  The last name of the roommate to be created.
-- `chores`: array of integers (optional)  
-  A list of chore IDs that this roommate is responsible for. If this array is empty or not provided, the roommate will initially have no assigned chores.
+- **`first_name`**: *string* (required)  
+  The first name of the new roommate.
 
-  **Note:** If chores are assigned during roommate creation, the API will verify the validity of each chore ID. If any chore ID is invalid or already assigned to another roommate, an error will be returned.
+- **`last_name`**: *string* (required)  
+  The last name of the new roommate.
+
+- **`email`**: *string* (required)  
+  The email address of the new roommate.
 
 **Response:**
 
-- `roommate_id`: integer  
-  The unique identifier of the created roommate.
-- `message`: string  
-  A confirmation message indicating that the roommate was successfully created.
+- **`First Name`**: *string*  
+  The first name of the newly created roommate.
+
+- **`Last Name`**: *string*  
+  The last name of the newly created roommate.
+
+- **`Email`**: *string*  
+  The email address of the newly created roommate.
+
+- **`roommate id`**: *integer*  
+  The unique identifier (ID) of the newly created roommate.
 
 ---
 
 ### 8. Assign Chore to Roommate
 
-**Endpoint:** `POST /roommates/{id}/assignments`
+**Endpoint:** `POST /assign_chore/`
 
-**Description:** Assigns a specific chore to a roommate.
+**Description:** Assigns an existing chore to a specified roommate and sets the assignment status to `pending`. If the chore or roommate does not exist, or if the assignment already exists, an error is returned.
 
-**Request (Path Parameter):**
+**Request (Query Parameters):**
 
-- `id`: integer  
-  The unique identifier of the roommate to whom the chore will be assigned.
+- **`chore_id`**: *integer* (required)  
+  The unique identifier of the chore to be assigned.
 
-**Request Body:**
-
-- `chore_id`: integer  
-  The unique identifier of the chore to be assigned to the roommate.
-
-  **Note:** The API will verify that the chore ID is valid and not already assigned to another roommate. If the chore is invalid or already assigned, an error will be returned.
+- **`roommate_id`**: *integer* (required)  
+  The unique identifier of the roommate to whom the chore is being assigned.
 
 **Response:**
 
-- `message`: string  
-  A confirmation message indicating the result of the assignment.
-- `assigned_chore_id`: integer  
-  The unique identifier of the assigned chore.
+- **`chore_id`**: *integer*  
+  The ID of the assigned chore.
+
+- **`roommate_id`**: *integer*  
+  The ID of the roommate to whom the chore is assigned.
+
+- **`status`**: *string*  
+  The initial status of the assignment, set to `pending`.
+
+**Errors:**
+
+- **404 Not Found**: Returned if either the `chore_id` or `roommate_id` does not exist in the database.
+- **400 Bad Request**: Returned if the chore has already been assigned to the specified roommate.
+
+**Notes:**
+
+- This endpoint only allows assigning an existing chore to an existing roommate.
+- The assignment status is initially set to `pending` upon successful assignment.
 
 ---
 
 ### 9. Get All Roommates
 
-**Endpoint:** `GET /roommates`
+**Endpoint:** `GET /get_roommate`
 
-**Description:** Retrieves a list of all roommates, with optional filters by name.
-
-**Request (Query Parameters):**
-
-- `first_name`: string (optional)  
-  The first name of the roommate to filter results. If not provided, all roommates will be returned.
-  
-- `last_name`: string (optional)  
-  The last name of the roommate to filter results. If not provided, all roommates will be returned.
+**Description:** Retrieves a list of all roommates, including their first name, last name, and email address.
 
 **Response:**
 
-- `roommates`: array of objects  
-  A list of roommates matching the filter criteria, or all roommates if no filters are provided.
+- **`roommates`**: *array of objects*  
+  A list of roommates.
 
-  - `id`: integer  
-    The unique identifier of the roommate.
-    
-  - `first_name`: string  
+  - **`first_name`**: *string*  
     The first name of the roommate.
-    
-  - `last_name`: string  
+
+  - **`last_name`**: *string*  
     The last name of the roommate.
-    
-  - `chores`: array of objects  
-    A list of chore objects assigned to the roommate.
 
-    - `id`: integer  
-      The unique identifier of the chore.
-      
-    - `name`: string  
-      The name or description of the chore.
-      
-    - `due_date`: string (YYYY-MM-DD) 
-
-      The due date of the chore.
+  - **`email`**: *string*  
+    The email address of the roommate.
 
 ---
 
@@ -348,111 +316,175 @@ The request body supports partial updates. You may include one or more of the fo
 
 ---
 
-### 11. Create a Bill
+### 11. Create Bill
 
-**Endpoint:** `POST /bills`
+**Endpoint:** `POST /create_bill`
 
-**Description:** Creates a new bill and assigns it to the responsible roommates.
+**Description:** Creates a new bill with a specified cost, due date, type, and message, then assigns the bill to all roommates, splitting the cost evenly among them.
 
 **Request Body:**
 
-- `total_amount`: float  
-  The total amount of the bill.
+- **`cost`**: *float* (required)  
+  The total amount of the bill to be split among all roommates.
 
-- `roommate_ids`: array of integers  
-  A list of unique identifiers of the roommates responsible for paying the bill.
+- **`due_date`**: *string* (required)  
+  The due date for the bill, formatted as `YYYY-MM-DD`.
 
-- `due_date`: string (YYYY-MM-DD)  
-  The date by which the bill must be paid.
+- **`bill_type`**: *enum* (required)  
+  The type of bill (e.g., `electricity`, `rent`, `internet`).
 
-**Response:**
-
-- `bill_id`: integer  
-  The unique identifier of the created bill.
-
-- `message`: string  
-  A confirmation message indicating the successful creation of the bill.
-
----
-
-### 12. Get a Bill 
-
-**Endpoint:** `GET /bills`
-
-**Description:** Retrieves all bills, with an optional filter by status.
-
-**Request (Query Parameter):**
-
-  - `status`: string (optional) 
-
-    Filter bills by their status. Possible values are "paid" or "unpaid".
+- **`message`**: *string* (optional)  
+  An optional message associated with the bill.
 
 **Response:**
 
-- `bill_id`: integer
+- **`bill_id`**: *integer*  
+  The unique identifier for the created bill.
 
-  The unique identifier of the bill
-  
-- `description`: string
+- **`message`**: *string*  
+  A confirmation message indicating the bill has been created and assigned to all roommates.
 
-  A brief description of the bill (e.g., "Electricity bill").
+**Notes:**
 
-- `total_amount`: float
+- The cost of the bill is divided evenly among all roommates in the database.
+- Each roommate is assigned a portion of the bill with a status of `unpaid`.
+- If there are no roommates, the request will fail with a `400 Bad Request` error.
 
-  The total amount of the bill.
-
-- `due_date`: string (YYYY-MM-DD)
-
-  The due date for the bill payment.
-
-- `status`: string
-
-  The current payment status of the bill (e.g., "paid" or "unpaid").
-
-- `roommates`: array of objects
-
-  A list of roommates and their respective payment statuses.
-    - `roommate_id `: integer
-
-      The unique identifier of the roommate.
-      
-    - `amount_due`: float
-
-      The amount the roommate is responsible for.
-      
-    - `status`: string
-
-      The unique identifier of the roommate.
-      
-    - `roommate_id `: integer
-
-      The payment status for the roommate (e.g., "paid", "unpaid").
 ---
-  
-### 13. Update a Bill 
 
-**Endpoint:** `PATCH /bills/{bill_id}`
+### 12. Get All Bills
 
-**Description:** Updates the due date or description of a bill.
+**Endpoint:** `GET /get_bill`
+
+**Description:** Retrieves a list of all bills, including details about each bill's total cost, due date, type, message, and each roommate’s status and name associated with the bill.
+
+**Response:**
+
+- **`bills`**: *array of objects*  
+  A list of bills with details for each assignment.
+
+  - **`total_cost`**: *float*  
+    The total amount of the bill.
+
+  - **`due_date`**: *string*  
+    The due date for the bill, formatted as `YYYY-MM-DD`.
+
+  - **`bill_type`**: *string*  
+    The type of the bill (e.g., `electricity`, `rent`, `internet`).
+
+  - **`message`**: *string*  
+    An optional message associated with the bill.
+
+  - **`roommate_id`**: *integer*  
+    The unique identifier for the roommate assigned to the bill.
+
+  - **`roommate_name`**: *string*  
+    The full name of the roommate assigned to the bill.
+
+  - **`status`**: *string*  
+    The payment status for the roommate's portion of the bill (e.g., `unpaid`, `paid`).
+
+---
+
+### 13. Get Bill Assignments
+
+**Endpoint:** `GET /{bill_id}/assignments`
+
+**Description:** Retrieves the payment assignments for a specific bill, including each roommate’s assigned amount and payment status.
 
 **Request (Path Parameter):**
 
-- `bill_id`: integer
-
-  The unique identifier of the bill to be updated.
-
-**Request Body:**
-
-- `due_date`: string (YYYY-MM-DD)(optional)
-
-  The new due date for the bill
-  
-- `description`: string (optional)
-
-  An updated description of the bill.
+- **`bill_id`**: *integer* (required)  
+  The unique identifier for the bill whose assignments are being retrieved.
 
 **Response:**
 
-- `message`: string
+- **`bill_id`**: *integer*  
+  The ID of the specified bill.
 
-  A confirmation message indicating the successful update of the bill
+- **`assignments`**: *array of objects*  
+  A list of assignments for the bill, detailing each roommate's payment status and amount due.
+
+  - **`roommate_id`**: *integer*  
+    The unique identifier for the roommate assigned to this portion of the bill.
+
+  - **`status`**: *string*  
+    The payment status of the roommate's portion (e.g., `unpaid`, `paid`).
+
+  - **`amount`**: *float*  
+    The amount owed by the roommate for this bill.
+
+**Errors:**
+
+- **404 Not Found**: Returned if no assignments are found for the specified `bill_id`.
+
+---
+  
+### 14. Update Bill Assignment Status
+
+**Endpoint:** `PATCH /update_bill_list_status/{bill_id}/payments/{roommate_id}`
+
+**Description:** Updates the payment status of a specific roommate’s assignment for a particular bill. If the status is updated to `paid`, the amount is set to `0`.
+
+**Request (Path Parameters):**
+
+- **`bill_id`**: *integer* (required)  
+  The unique identifier for the bill.
+
+- **`roommate_id`**: *integer* (required)  
+  The unique identifier for the roommate assigned to the bill.
+
+**Request Body:**
+
+- **`status`**: *string* (required)  
+  The new payment status for the roommate's assignment. Allowed values are `paid` or `unpaid`.
+
+**Response:**
+
+- **`message`**: *string*  
+  A confirmation message indicating the status update was successful or if no matching bill was found.
+
+**Errors:**
+
+- **404 Not Found**: Returned if no bill assignment is found with the specified `bill_id` and `roommate_id`.
+
+---
+
+### 15. Update Bill Details
+
+**Endpoint:** `PATCH /update_bill/{bill_id}`
+
+**Description:** Updates specified fields for a particular bill, allowing for partial updates to the bill’s `due_date`, `bill_type`, or `message`.
+
+**Request (Path Parameter):**
+
+- **`bill_id`**: *integer* (required)  
+  The unique identifier for the bill to be updated.
+
+**Request Body (Partial Updates):**
+
+You may include one or more of the following fields to update specific attributes of the bill:
+
+- **`due_date`**: *string* (optional)  
+  The new due date for the bill, formatted as `YYYY-MM-DD`.
+
+- **`bill_type`**: *string* (optional)  
+  The type of the bill (e.g., `electricity`, `rent`, `internet`).
+
+- **`message`**: *string* (optional)  
+  A new message or note associated with the bill.
+
+**Response:**
+
+- **`message`**: *string*  
+  A confirmation message indicating the result of the update or if no changes were made.
+
+**Errors:**
+
+- **404 Not Found**: Returned if no bill is found with the specified `bill_id`.
+- **400 Bad Request**: Returned if no update fields are provided in the request.
+
+**Notes:**
+
+- If no fields are provided in the request body, the update will not proceed, and a message will be returned indicating that no changes were made.
+
