@@ -138,7 +138,7 @@ class StatusEnum(str, Enum):
 class PaymentUpdate(BaseModel):
     status: StatusEnum
 
-@router.patch("/update_bill_status/{bill_id}/payment/{roommate_id}", tags=["bill"])
+@router.patch("/update_bill_status/{bill_id}/payments/{roommate_id}", tags=["bill"])
 def update_bill_list_status(bill_id: int, roommate_id: int, payment_update: PaymentUpdate):
     with db.engine.begin() as connection:     
        result = connection.execute(sqlalchemy.text(
