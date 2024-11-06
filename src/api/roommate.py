@@ -18,8 +18,24 @@ class Roommate(BaseModel):
 
 @router.get("/get_roommate", tags=["roommate"])
 def get_roommates():
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT r.first_name, r.last_name, r.email
+                FROM roommate r
+                """
+            )
+        ).fetchall()
+    roommate_list = []
+    for roommate in result:
+        roommate_list.append({
+            "first_name": roommate.first_name,
+            "last_name": roommate.last_name,
+            "email": roommate.email
+        })
     
-    return "test"
+    return roommate_list
 
 @router.post("/create_roommate", tags=["roommate"])
 def create_roommate(new_roommate: Roommate):
