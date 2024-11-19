@@ -116,7 +116,7 @@ def rotate_chore(chore_id: int, roommate_id: int):
         ).all()
 
     if weekly_chores: 
-        next_result = db.session.execute(sqlalchemy.text("""
+        next_result = connection.execute(sqlalchemy.text("""
         SELECT id
         FROM roommate
         WHERE id > :roommate_id
@@ -126,7 +126,7 @@ def rotate_chore(chore_id: int, roommate_id: int):
         next_roommate = next_result.fetchone()
 
         if not next_roommate:
-            next_roommate = db.session.execute(sqlalchemy.text("""
+            next_roommate = connection.execute(sqlalchemy.text("""
                 SELECT id
                 FROM roommate
                 ORDER BY id ASC
