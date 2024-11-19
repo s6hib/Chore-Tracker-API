@@ -1,4 +1,4 @@
-# Roommate Deletion During Bill Creation
+# 1. Roommate Deletion During Bill Creation
 
 **Scenario**: Person A creates a new bill while Person B removes a roommate from the system.
 
@@ -11,9 +11,20 @@
 6. System attempts to create bill_list entries, assigning $100 to each roommate
 7. Operation fails when trying to create bill_list entry for Sahib (who no longer exists)
 
-**Problem**: Without proper concurrency control:
-- The bill gets created but bill assignments fail
-- System has inconsistent state: bill exists but no assignments
-- Total amount assigned doesn't match original bill amount
+**Problem**: Without proper concurrency control the entire transaction fails, so inserting the bill gets rolled back.
 
 This is a good example of a race condition where the system assumes the number of roommates stays the same, but that changes because of other actions happening at the same time.
+
+# 2. Roommate Deletion During Chore Rotation
+
+**Scenario**: Weekly chore rotation occurs while someone removes the next assigned roommate.
+
+**Sequence of Events**:
+1. System starts weekly chore rotation for "Clean the Kitchen"
+2. Current assignment is to Sue 
+3. System calculates next assignment should go to Carson 
+4. Meanwhile, someone removes Carson from the system
+5. System attempts to update chore_assignment with Carson's roommate_id
+6. Operation fails due to Carson no longer existing
+
+**Problem**: Without proper concurrency control this transaction fails, so now the rotation gets broken and we have an unassigned chore.
