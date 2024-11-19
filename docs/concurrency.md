@@ -11,9 +11,6 @@
 6. System attempts to create bill_list entries, assigning $100 to each roommate
 7. Operation fails when trying to create bill_list entry for Sahib (who no longer exists)
 
-**Problem**: Without proper concurrency control:
-- The bill gets created but bill assignments fail
-- System has inconsistent state: bill exists but no assignments
-- Total amount assigned doesn't match original bill amount
+**Problem**: Without proper concurrency contro the entire transaction fails, so inseting the bill gets rolled back
 
 This is a good example of a race condition where the system assumes the number of roommates stays the same, but that changes because of other actions happening at the same time.
