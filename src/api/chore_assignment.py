@@ -103,7 +103,7 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
 
 
 @router.post("/rotate_chore/", tags=["chore_assignment"])
-def rotate_chore():
+def rotate_chore(roommate_id: int):
     with db.engine.begin() as connection:
         weekly_chores = connection.execute(sqlalchemy.text(
             """
