@@ -117,16 +117,16 @@ def get_bill_assignments(bill_id: int):
         # If no assignments are found, return an error
         if not result:
             raise HTTPException(status_code=404, detail="No assignments found for this bill.")
+    
+    bill_assignments = []
+    for bill in result:
+        bill_assignments.append({
+            "roommate_id": bill.roommate_id,
+            "status": bill.status,
+            "amount": bill.amount
+        })
 
-    # Format the result as a list of dictionaries
-    bill_assignments = [
-        {
-            "roommate_id": row.roommate_id,
-            "status": row.status,
-            "amount": row.amount
-        }
-        for row in result
-    ]
+    print(bill_assignments)
     
     return {"bill_id": bill_id, "assignments": bill_assignments}
 
