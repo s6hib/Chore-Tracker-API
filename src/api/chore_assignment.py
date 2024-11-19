@@ -100,3 +100,53 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
         "roommate_id": roommate_id, 
         "new_status": status_update.status 
     }
+
+
+@router.post("/rotate_chore/", tags=["chore_assignment"])
+def rotate_chore(chore_id: int, roommate_id: int):
+    with db.engine.begin() as connection:
+        weekly_chores = connection.execute(sqlalchemy.text("""
+            SELECT id FROM chore WHERE frequency = :frequency
+        """), {"frequency": "weekly"}).all()
+
+        if weekly_chores:
+            next_result = connection.execute(sqlalchemy.text("""
+                SELECT id
+                FROM roommate
+                WHERE id > :roommate_id
+                ORDER BY id ASC
+                LIMIT 1
+            """), {'roommate_id': roommate_id})
+            
+            next_roommate = next_result.fetchone()
+
+            if not next_roommate:
+                next_roommate = connection.execute(sqlalchemy.text("""
+                    SELECT id
+                    FROM roommate
+                    ORDER BY id ASC
+                    LIMIT 1
+                """)).fetchone()
+
+            new_roommate_id = next_roommate.id if next_roommate else roommate_id
+
+            connection.execute(sqlalchemy.text("""
+                UPDATE chore_assignment
+                SET roommate_id = :new_roommate_id
+                WHERE chore_id = :chore_id
+            """), {
+                "chore_id": chore_id,
+                "new_roommate_id": new_roommate_id
+            })
+
+            return {
+                "message": "Chores Rotated Successfully", 
+                "chore_id": chore_id, 
+                "new_roommate_id": new_roommate_id,  
+            }
+
+    return {
+        "message": "No weekly chores found", 
+        "chore_id": chore_id, 
+        "new_roommate_id": roommate_id,  
+    }
