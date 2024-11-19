@@ -128,7 +128,7 @@ def rotate_chore(chore_id: int, roommate_id: int):
                     LIMIT 1
                 """)).fetchone()
 
-            new_roommate_id = next_roommate['id'] if next_roommate else roommate_id
+            new_roommate_id = next_roommate.id if next_roommate else roommate_id
 
             connection.execute(sqlalchemy.text("""
                 UPDATE chore_assignment
