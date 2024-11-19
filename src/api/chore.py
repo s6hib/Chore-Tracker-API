@@ -51,6 +51,32 @@ def create_chore(chore: Chore):
     
     return {"message": f"Chore {chore.name} created successully.", "chore_id": chore_id }
 
+@router.post("/update_chore_status", tags=["chore"])
+def update_chore_priority(new_priority: int, chore_id: int):
+    with db.engine.begin() as connection:
+        connection.execute(sqlalchemy.text(
+            """
+            UPDATE chore 
+            SET priority = :new_priority
+            WHERE id = :chore_id;
+            """
+        ),{
+            "new_priority": new_priority,
+            "chore_id": chore_id
+        })
+        chore = connection.execute(sqlalchemy.text(
+            """
+            SELECT name, location_in_house, frequency, duration_mins, priority, due_date
+            FROM chore
+            WHERE id = :chore_id;
+            """
+        ),{
+            "chore_id": chore_id
+        }).fetchone()
+
+    
+    return {f"message: Chore priority updated successfully, Chore[chore_id: {chore_id}, name:{chore.name}, location_in_house:{chore.location_in_house}, frequency:{chore.frequency}, duration_mins:{chore.duration_mins}, priority:{chore.priority}, due_date:{chore.due_date}]" }
+
 @router.get("/get_chore", tags=["chore"])
 def get_chores(priority: Optional[int] = None):
     with db.engine.begin() as connection:
