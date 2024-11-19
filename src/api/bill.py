@@ -8,6 +8,8 @@ from src import database as db
 from src.api.roommate import Roommate
 from typing import List, Optional
 
+import math
+
 router = APIRouter(
     prefix="/bills",
     tags=["bill"],
@@ -59,16 +61,32 @@ def create_bill(bill_to_assign: Bill):
             raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
         cost_per_roommate = bill_to_assign.cost / num_roommates
 
-        connection.execute(sqlalchemy.text(
-            """
-            INSERT INTO bill_list (roommate_id, bill_id, status, amount)
-            SELECT id, :bill_id, 'unpaid', :cost_per_roommate
-            FROM roommate
-            """
-        ),{
-            "bill_id": bill_id,
-            "cost_per_roommate" : cost_per_roommate
-        })
+        cost_per_roommate_rounded_down = math.floor(cost_per_roommate * 100) / 100
+
+        cost_per_roommate_rounded_up = math.ceil(cost_per_roommate * 100) / 100
+
+        cents_over_cost = round((cost_per_roommate_rounded_up * num_roommates - bill_to_assign.cost) * 100)
+
+        print(f"cents over cost {cents_over_cost}")
+
+        for roommate in roommates:
+            if cents_over_cost > 0:
+                cost = cost_per_roommate_rounded_down
+                cents_over_cost -= 1
+            else:
+                cost = cost_per_roommate_rounded_up
+            connection.execute(sqlalchemy.text(
+                """
+                INSERT INTO bill_list (roommate_id, bill_id, status, amount)
+                VALUES (:roommate_id, :bill_id, 'unpaid', :cost_per_roommate)
+                """
+                ),{
+                    "roommate_id": roommate.id,
+                    "bill_id": bill_id,
+                    "cost_per_roommate" : cost
+                })
+
+        print(f"cost per roommate {cost_per_roommate}")
             
     return {
         "bill_id": bill_id,
