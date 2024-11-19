@@ -100,3 +100,29 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
         "roommate_id": roommate_id, 
         "new_status": status_update.status 
     }
+
+
+@router.post("/rotate_chore/", tags=["chore_assignment"])
+def rotate_chore(chore_id: int, roommate_id: int):
+    for chore in Chore:
+        if chore['frequency'] == 'weekly':
+            new_roommate_id = roommate_id + 1
+            with db.engine.begin() as connection:
+                connection.execute(sqlalchemy.text(
+                    """
+                    UPDATE chore_assignment
+                    SET roommate_id = :new_roommate_id
+                    WHERE chore_id = :chore_id
+                    """
+                ),
+                {
+                    "chore_id": chore_id,
+                    "new_roommate_id": new_roommate_id
+                }
+                )
+
+            return {
+                "message": "Chores Rotated Successfully", 
+                "chore_id" : chore_id, 
+                "new_roommate_id": roommate_id,  
+            }
