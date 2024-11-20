@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from src.api import auth
 from pydantic import BaseModel
 
@@ -16,7 +16,7 @@ class Roommate(BaseModel):
     last_name: str
     email: str
 
-@router.get("/get_roommate", tags=["roommate"])
+@router.get("/")
 def get_roommates():
     with db.engine.begin() as connection:
         result = connection.execute(
@@ -37,7 +37,7 @@ def get_roommates():
     
     return roommate_list
 
-@router.post("/create_roommate", tags=["roommate"])
+@router.post("/")
 def create_roommate(new_roommate: Roommate):
     with db.engine.begin() as connection:
         roommate_id = connection.execute(
@@ -57,7 +57,7 @@ def create_roommate(new_roommate: Roommate):
     return {"First Name": new_roommate.first_name, "Last Name": new_roommate.last_name, "Email": new_roommate.email, "roommate id": roommate_id.id}
 
 
-@router.post("/remove_roommate", tags=["roommate"])
+@router.delete("/roommates/{roommate_id}")
 def remove_roommate(roommate_id: int):
     with db.engine.begin() as connection:
         roommate_removed = connection.execute(
@@ -73,4 +73,13 @@ def remove_roommate(roommate_id: int):
                 "roommate_id": roommate_id
             }
         ).fetchone()
-    return {"roommate id": roommate_removed.id, "First Name": roommate_removed.first_name, "Last Name": roommate_removed.last_name, "Email": roommate_removed.email}
+
+        if not roommate_removed:
+            raise HTTPException(status_code=404, detail="Roommate not found")
+    
+    return {
+        "roommate_id": roommate_removed.id,
+        "First Name": roommate_removed.first_name,
+        "Last Name": roommate_removed.last_name,
+        "Email": roommate_removed.email
+    }

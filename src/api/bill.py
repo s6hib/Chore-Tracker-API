@@ -31,7 +31,7 @@ class Bill(BaseModel):
     bill_type: BillTypeEnum
     message: Optional[str]
 
-@router.post("/create_bill", tags=["bill"])
+@router.post("/")
 def create_bill(bill_to_assign: Bill):
     with db.engine.begin() as connection:
         add_bill_query = connection.execute(sqlalchemy.text(
@@ -94,7 +94,7 @@ def create_bill(bill_to_assign: Bill):
     }   
 
 
-@router.get("/get_bill", tags=["bill"])
+@router.get("/")
 def get_bill():
     with db.engine.begin() as connection:
        result = connection.execute(sqlalchemy.text(
@@ -120,7 +120,7 @@ def get_bill():
 
     return bill_list
 
-@router.get("/{bill_id}/assignments", tags=["bill"])
+@router.get("/{bill_id}/assignments")
 def get_bill_assignments(bill_id: int):
     with db.engine.begin() as connection:
         # Query all assignments for the specified bill_id
@@ -156,7 +156,7 @@ class StatusEnum(str, Enum):
 class PaymentUpdate(BaseModel):
     status: StatusEnum
 
-@router.patch("/update_bill_list_status/{bill_id}/payments/{roommate_id}", tags=["bill"])
+@router.patch("/{bill_id}/payments/{roommate_id}")
 def update_bill_list_status(bill_id: int, roommate_id: int, payment_update: PaymentUpdate):
     with db.engine.begin() as connection:     
        result = connection.execute(sqlalchemy.text(
@@ -193,7 +193,7 @@ class BillUpdate(BaseModel):
             }
         }
 
-@router.patch("/update_bill/{bill_id}", tags=["bill"], response_model=dict)
+@router.patch("/bills/{bill_id}", response_model=dict)
 def update_bill(bill_id: int, bill_update: BillUpdate):
     update_fields = {}
     sql_set_clause = []

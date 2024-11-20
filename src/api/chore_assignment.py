@@ -21,7 +21,7 @@ router = APIRouter(
 class ChoreStatusUpdate(BaseModel):
     status: str
 
-@router.post("/assign_chore/", tags=["chore_assignment"])
+@router.post("/{chore_id}/assignments")
 def assign_chore(chore_id: int, roommate_id: int):
     with db.engine.begin() as connection:
          # Check if chore_id exists in the `chore` table
@@ -76,7 +76,7 @@ def assign_chore(chore_id: int, roommate_id: int):
     }
 
 
-@router.patch("/{chore_id}/assignments/{roommate_id}/status", tags=["chore_assignment"])
+@router.patch("/{chore_id}/assignments/{roommate_id}/status")
 def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreStatusUpdate):
     with db.engine.begin() as connection:
         connection.execute(sqlalchemy.text(
@@ -101,7 +101,7 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
         "new_status": status_update.status 
     }
 
-@router.post("/rotate_chore/", tags=["chore_assignment"])
+@router.post("/assignments/weekly/{chore_id}/rotate")
 def rotate_chore(chore_id: int, roommate_id: int):
     with db.engine.begin() as connection:
         weekly_chores = connection.execute(sqlalchemy.text("""

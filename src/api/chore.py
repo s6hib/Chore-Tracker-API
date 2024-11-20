@@ -29,7 +29,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.post("/create_chore", tags=["chore"])
+@router.post("/")
 def create_chore(chore: Chore):
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(
@@ -51,7 +51,7 @@ def create_chore(chore: Chore):
     
     return {"message": f"Chore {chore.name} created successully.", "chore_id": chore_id }
 
-@router.post("/update_chore_status", tags=["chore"])
+@router.post("/update_chore_status")
 def update_chore_priority(new_priority: int, chore_id: int):
     with db.engine.begin() as connection:
         connection.execute(sqlalchemy.text(
@@ -77,7 +77,7 @@ def update_chore_priority(new_priority: int, chore_id: int):
     
     return {f"message: Chore priority updated successfully, Chore[chore_id: {chore_id}, name:{chore.name}, location_in_house:{chore.location_in_house}, frequency:{chore.frequency}, duration_mins:{chore.duration_mins}, priority:{chore.priority}, due_date:{chore.due_date}]" }
 
-@router.get("/get_chore", tags=["chore"])
+@router.get("/")
 def get_chores(priority: Optional[int] = None):
     with db.engine.begin() as connection:
         if priority is not None:
@@ -111,7 +111,7 @@ def get_chores(priority: Optional[int] = None):
         
     return chore_list
 
-@router.get("/history", tags=["chore"])
+@router.get("/history")
 def get_chore_history():
     # calculate date 30 days ago
     thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
