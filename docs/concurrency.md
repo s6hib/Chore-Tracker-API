@@ -21,7 +21,7 @@ sequenceDiagram
     participant Database
     participant T2
 
-    Note over PersonA, PersonB: Scenario - Person A creates a new bill while Person B removes a roommate from the system
+    Note over T1, T2: Scenario - Person A creates a new bill while Person B removes a roommate from the system
     T1->>Database: POST /bills/create_bill with $400 electricity bill
     T1->>Database: Inserts new bill # 14 into the bill table
     Database->>Database: Query roommate counts by selecting all the roommate IDs (finds 4 roommates: Sahib, Carson, Antony, Sue)
