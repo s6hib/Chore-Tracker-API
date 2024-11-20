@@ -55,3 +55,22 @@ def create_roommate(new_roommate: Roommate):
             }
         ).fetchone()
     return {"First Name": new_roommate.first_name, "Last Name": new_roommate.last_name, "Email": new_roommate.email, "roommate id": roommate_id.id}
+
+
+@router.post("/remove_roommate", tags=["roommate"])
+def remove_roommate(roommate_id: int):
+    with db.engine.begin() as connection:
+        roommate_removed = connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE
+                FROM roommate
+                WHERE id = :roommate_id
+                RETURNING id, first_name, last_name, email
+                """
+            ),
+            {
+                "roommate_id": roommate_id
+            }
+        ).fetchone()
+    return {"roommate id": roommate_removed.id, "First Name": roommate_removed.first_name, "Last Name": roommate_removed.last_name, "Email": roommate_removed.email}
