@@ -27,7 +27,7 @@ sequenceDiagram
     Database->>Database: Query roommate counts by selecting all the roommate IDs (finds 4 roommates: Sahib, Carson, Antony, Sue)
     Database->>Database: Calculate per-person cost ($400/4 = $100 each)
     T2->>Database: Remove Sahib from the roommate table
-    T2-->>Database: DELETE FROM roommate WHERE ID = :roommate_id RETURNING details
+    Database-->>T2: DELETE FROM roommate WHERE ID = :roommate_id RETURNING details
     Note over T1, T2: Sahib no longer exists in the roommate table
     T1->>Database: Attempt to insert bill_list entries, assigning $100 to each roommate
     Database-->>T1: Error occurs when trying to create bill_list entry for Sahib
