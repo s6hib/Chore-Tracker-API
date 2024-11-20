@@ -29,36 +29,6 @@ This is a good example of a race condition where the system assumes the number o
 
 **Problem**: Without proper concurrency control this transaction fails, so now the rotation gets broken and we have an unassigned chore.
 
-sequenceDiagram
-    participant T1
-    participant Database
-    participant T2
-    Note over T1, T2: Chore labeled Clean Kitchen is assigned to Roommate Sue (Sue roommate id 1, Carson roommate id 2, Clean Kitchen chore id 1) 
-    T1->>Database: Rotate chore "Clean Kitchen" from Sue to next roommate
-    T1->>Database: next_result = connection.execute(sqlalchemy.text("""
-                SELECT id
-                FROM roommate
-                WHERE id > :roommate_id
-                ORDER BY id ASC
-                LIMIT 1
-            """), {'roommate_id': roommate_id})
-    T2->>Database: Remove Carson from the roommate table
-    T2->>Database: DELETE
-                FROM roommate
-                WHERE id = :roommate_id
-                RETURNING id, first_name, last_name, email
-    Note over T1, T2: Carson with roommate id 2 no longer exist in the roommate table
-    T1->>Database: Assign Clean Kitchen chore to next roommate id after Sue
-    T1->>Database: connection.execute(sqlalchemy.text("""
-                UPDATE chore_assignment
-                SET roommate_id = :new_roommate_id
-                WHERE chore_id = :chore_id
-            """), {
-                "chore_id": chore_id,
-                "new_roommate_id": new_roommate_id
-            })
-    Note over T1, T2: Causes an error because T1 tries to assign a chore to a roommate that doesn't exist in the database anymore.
-
 ``` mermaid
 sequenceDiagram
     participant T1
