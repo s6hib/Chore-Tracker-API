@@ -15,6 +15,15 @@
 
 This is a good example of a race condition where the system assumes the number of roommates stays the same, but that changes because of other actions happening at the same time.
 
+**Isolation Solution**: 
+In this scenario, we can use a SERIALIZABLE isolation level because we're doing multiple reads and writes that depend on each other. Here's why:
+
+1. We first read the roommate count to calculate costs
+2. Then we write multiple bill_list entries based on that count
+3. If someone deletes a roommate between these steps, we get an error
+
+With SERIALIZABLE, the transaction would lock the roommate table during bill creation. This would prevent the deletion of a roommate from happening in the middle of the bill creation process. It's also worth noting that a SERIALIZABLE isolation level is not the best because it's sometimes not worth the performance hit, but in this case we can live with it.
+
 ``` mermaid
 sequenceDiagram
     participant T1
@@ -48,6 +57,16 @@ sequenceDiagram
 
 **Problem**: Without proper concurrency control this transaction fails, so now the rotation gets broken and we have an unassigned chore.
 
+**Isolation Solution**:
+For chore rotation, REPEATABLE READ is our best bet. Here's why:
+1. We're doing a SELECT to find the next roommate, then an UPDATE to assign the chore
+2. We need to make sure the roommate we selected still exists when we do the UPDATE
+3. But we don't need to lock the whole roommate table like SERIALIZABLE would
+
+REPEATABLE READ is perfect because it ensures that if we read a roommate's info, that info stays consistent throughout our transaction. If someone tries to delete Carson while we're rotating chores, either:
+- Our transaction completes first and Carson gets the chore (then he can be deleted)
+- The delete happens first and our rotation picks the next available roommate
+
 ``` mermaid
 sequenceDiagram
     participant T1
@@ -79,6 +98,19 @@ sequenceDiagram
 - Same chore gets assigned to multiple people
 - Duplicate chore assignments
 - Confusion in who is doing what chore
+
+**Isolation Solution**:
+For this one, READ COMMITTED is actually enough, but we need to add a unique constraint:
+1. We don't need super strict isolation because we're just doing one write
+2. Instead, we could add a unique constraint on chore_id in the chore_assignment table
+3. This way, if two people try to assign the same chore, the database will only let one succeed
+
+This is a lot better than using SERIALIZABLE because:
+- It's faster (no need to lock tables)
+- It's simpler (let the database handle it with constraints)
+- It still prevents the problem (can't have duplicate assignments)
+
+Plus, if the second assignment fails, we can just show a message like "Sorry, someone already claimed that chore!" which is exactly what we want anyway.
 
 ``` mermaid
 sequenceDiagram
