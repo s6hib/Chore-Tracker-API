@@ -15,6 +15,26 @@
 
 This is a good example of a race condition where the system assumes the number of roommates stays the same, but that changes because of other actions happening at the same time.
 
+``` mermaid
+sequenceDiagram
+    participant PersonA
+    participant Database
+    participant PersonB
+
+    Note over PersonA, PersonB: Scenario - Person A creates a new bill while Person B removes a roommate from the system
+    PersonA->>Database: POST /bills/create_bill with $400 electricity bill
+    Database->>PersonA: Inserts new bill into the bill table with ID #14
+    Person A->>Database: Query roommate counts by selecting all the roommate IDs (finds 4 roommates: Sahib, Carson, Antony, Sue)
+    Person A->>Database: Calculate per-person cost ($400/4 = $100 each)
+    PersonB->>Database: Remove Sahib from the roommate table
+    Database-->>PersonB: DELETE FROM roommate WHERE ID = :roommate_id RETURNING details
+    Note over PersonA, PersonB: Sahib no longer exists in the roommate table
+    PersonA->>Database: Attempt to insert bill_list entries, assigning $100 to each roommate
+    Note over T1, T2: Carson (ID 2) no longer exists in the roommate table
+    Database-->>PersonA: Error occurs when trying to create bill_list entry for Sahib
+    Note over PersonA, PersonB: Transaction fails and inserting the bill is rolled back
+```
+
 # 2. Roommate Deletion During Chore Rotation
 
 **Scenario**: Weekly chore rotation occurs while someone removes the next assigned roommate.
