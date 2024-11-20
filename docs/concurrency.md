@@ -28,3 +28,20 @@ This is a good example of a race condition where the system assumes the number o
 6. Operation fails due to Carson no longer existing
 
 **Problem**: Without proper concurrency control this transaction fails, so now the rotation gets broken and we have an unassigned chore.
+
+``` mermaid
+sequenceDiagram
+    participant T1
+    participant Database
+    participant T2
+
+    Note over T1, T2: Chore "Clean Kitchen" is assigned to Sue (Sue: ID 1, Carson: ID 2, Chore: ID 1)
+    T1->>Database: Rotate chore "Clean Kitchen" to next roommate
+    T1->>Database: Query roommate with ID > :roommate_id (ORDER BY ID ASC LIMIT 1)
+    T2->>Database: Remove Carson from the roommate table
+    T2->>Database: DELETE FROM roommate WHERE ID = :roommate_id RETURNING details
+    Note over T1, T2: Carson (ID 2) no longer exists in the roommate table
+    T1->>Database: Assign "Clean Kitchen" chore to next roommate
+    T1->>Database: UPDATE chore_assignment with new_roommate_id
+    Note over T1, T2: Error occurs because the roommate no longer exists
+```
