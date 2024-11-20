@@ -101,7 +101,6 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
         "new_status": status_update.status 
     }
 
-
 @router.post("/rotate_chore/", tags=["chore_assignment"])
 def rotate_chore(chore_id: int, roommate_id: int):
     with db.engine.begin() as connection:

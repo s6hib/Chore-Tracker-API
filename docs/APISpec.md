@@ -184,7 +184,32 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 7. Create Roommate
+### 7. Rotate Chore
+
+**Endpoint:** `POST /chores/rotate_chore/`
+
+**Description:** Rotates weekly chores amongst roommates.
+
+**Request (Path Parameter):**
+
+- **`chore_id`**: *integer*  
+  The unique identifier of the chore.
+
+- **`roommate_id`**: *integer*  
+  The unique identifier of the roommate assigned to the chore.
+
+**Response:**
+
+- `message`: string  
+  A confirmation message indicating that the chore was successfully rotated.
+- `chore_id`: integer  
+  The unique identifier of the chore that was rotated.
+- `new_roommate_id`: integer  
+  The unique identifier of the new roommate that the chore got assigned to.
+
+---
+
+### 8. Create Roommate
 
 **Endpoint:** `POST /create_roommate`
 
@@ -217,7 +242,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 8. Assign Chore to Roommate
+### 9. Assign Chore to Roommate
 
 **Endpoint:** `POST /assign_chore/`
 
@@ -254,7 +279,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 9. Get All Roommates
+### 10. Get All Roommates
 
 **Endpoint:** `GET /get_roommate`
 
@@ -276,7 +301,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 10. Get Chores by Roommate
+### 11. Get Chores by Roommate
 
 **Endpoint:** `GET /roommates/{id}/chores`
 
@@ -316,7 +341,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 11. Create Bill
+### 12. Create Bill
 
 **Endpoint:** `POST /create_bill`
 
@@ -352,7 +377,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 12. Get All Bills
+### 13. Get All Bills
 
 **Endpoint:** `GET /get_bill`
 
@@ -386,7 +411,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 13. Get Bill Assignments
+### 14. Get Bill Assignments
 
 **Endpoint:** `GET /{bill_id}/assignments`
 
@@ -420,7 +445,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
   
-### 14. Update Bill Assignment Status
+### 15. Update Bill Assignment Status
 
 **Endpoint:** `PATCH /update_bill_list_status/{bill_id}/payments/{roommate_id}`
 
@@ -450,7 +475,7 @@ If no query parameters are provided, all chores will be returned.
 
 ---
 
-### 15. Update Bill Details
+### 16. Update Bill Details
 
 **Endpoint:** `PATCH /update_bill/{bill_id}`
 
