@@ -79,3 +79,20 @@ sequenceDiagram
 - Same chore gets assigned to multiple people
 - Duplicate chore assignments
 - Confusion in who is doing what chore
+
+``` mermaid
+sequenceDiagram
+    participant T1
+    participant Database
+    participant T2
+
+    Note over T1, T2: Scenario - Two roommates simultaneously try to assign the same chore
+    T1->>Database: Check if "Kitchen Cleaning" chore is assigned
+    T2->>Database: Check if "Kitchen Cleaning" chore is assigned
+    Database->>Database: Checks for chore assignment from T1 in (result: unassigned)
+    Database->>Database: Checks for chore assignment from T2 (result: unassigned)
+    T1->>Database: Assign chore to Roommate Carson
+    T2->>Database: Assign chore to Roommate Antony
+    Note over T1, T2: Problem - Same chore gets assigned to multiple people
+    Note over T1, T2: Duplicate chore assignments cause confusion
+```
