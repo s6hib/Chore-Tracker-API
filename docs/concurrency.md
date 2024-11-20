@@ -58,3 +58,4 @@ mermaid`sequenceDiagram
                 "new_roommate_id": new_roommate_id
             })
     Note over T1, T2: Causes an error because T1 tries to assign a chore to a roommate that doesn't exist in the database anymore.
+`
