@@ -87,12 +87,12 @@ sequenceDiagram
     participant T2
 
     Note over T1, T2: Scenario - Two roommates simultaneously try to assign the same chore
-    T1->>Database: Check if "Kitchen Cleaning" chore is assigned
-    T2->>Database: Check if "Kitchen Cleaning" chore is assigned
+    T1->>Database: Assign "Kitchen Cleaning" chore to Roommate Carson 
+    T2->>Database: Assign "Kitchen Cleaning" chore Roommate Antony
     Database->>Database: Checks for chore assignment from T1 in chore (result: unassigned)
     Database->>Database: Checks for chore assignment from T2 in chore (result: unassigned)
-    T1->>Database: Assign chore to Roommate Carson
-    T2->>Database: Assign chore to Roommate Antony
-    Note over T1, T2: Problem - Same chore gets assigned to multiple people
+    Database-->>T1: Return success message
+    Database-->>T2: Return success message
+    Note over T1, T2: Problem - Now same chore gets assigned to multiple people
     Note over T1, T2: Duplicate chore assignments cause confusion
 ```
