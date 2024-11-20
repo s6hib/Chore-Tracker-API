@@ -45,3 +45,18 @@ sequenceDiagram
     T1->>Database: UPDATE chore_assignment with new_roommate_id
     Note over T1, T2: Error occurs because the roommate no longer exists
 ```
+
+# 3. Chore Assignment at the Same Time
+
+**Scenario**: Two roommates simultaneously try to assign the same chore to different roommates.
+
+**Sequence of Events**:
+1. Roommate A checks if "Kitchen Cleaning" chore is assigned (result: unassigned)
+2. Roommate B checks if "Kitchen Cleaning" chore is assigned (result: unassigned)
+3. Roommate A assigns chore to Roommate Carson
+4. Roommate B assigns chore to Roommate Antony
+
+**Problem**: Without concurrency control:
+- Same chore gets assigned to multiple people
+- Duplicate chore assignments
+- Confusion in who is doing what chore
