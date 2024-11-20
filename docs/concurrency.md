@@ -30,7 +30,6 @@ sequenceDiagram
     Database-->>PersonB: DELETE FROM roommate WHERE ID = :roommate_id RETURNING details
     Note over PersonA, PersonB: Sahib no longer exists in the roommate table
     PersonA->>Database: Attempt to insert bill_list entries, assigning $100 to each roommate
-    Note over T1, T2: Carson (ID 2) no longer exists in the roommate table
     Database-->>PersonA: Error occurs when trying to create bill_list entry for Sahib
     Note over PersonA, PersonB: Transaction fails and inserting the bill is rolled back
 ```
