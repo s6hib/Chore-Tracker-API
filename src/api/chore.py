@@ -29,7 +29,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.post("/create_chore", tags=["chore"])
+@router.post("/")
 def create_chore(chore: Chore):
     if (chore.priority != 1 or chore.priority != 2 or chore.priority != 3 
         or chore.priority != 4 or chore.priority != 5):
@@ -93,7 +93,7 @@ def update_chore_priority(new_priority: int, chore_id: int):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while updating the chore priority")
 
-@router.get("/get_chore", tags=["chore"])
+@router.get("/")
 def get_chores(priority: Optional[int] = None):
     try:
         with db.engine.begin() as connection:
@@ -131,7 +131,7 @@ def get_chores(priority: Optional[int] = None):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while returning all chores (with specified priority)")
 
-@router.get("/history", tags=["chore"])
+@router.get("/history")
 def get_chore_history():
     # calculate date 30 days ago
     thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)

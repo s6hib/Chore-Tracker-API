@@ -21,7 +21,7 @@ router = APIRouter(
 class ChoreStatusUpdate(BaseModel):
     status: str
 
-@router.post("/assign_chore/", tags=["chore_assignment"])
+@router.post("/{chore_id}/assignments")
 def assign_chore(chore_id: int, roommate_id: int):
     try:
         with db.engine.begin() as connection:
@@ -80,7 +80,7 @@ def assign_chore(chore_id: int, roommate_id: int):
         raise HTTPException(status_code=500, detail="An error occurred while assigning the chore to a roommate")
 
 
-@router.patch("/{chore_id}/assignments/{roommate_id}/status", tags=["chore_assignment"])
+@router.patch("/{chore_id}/assignments/{roommate_id}/status")
 def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreStatusUpdate):
     try:
         with db.engine.begin() as connection:
@@ -109,8 +109,7 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreSta
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while updating the chore status")
 
-
-@router.post("/rotate_chore/", tags=["chore_assignment"])
+@router.post("/assignments/weekly/{chore_id}/rotate")
 def rotate_chore(chore_id: int, roommate_id: int):
     try:
         with db.engine.begin() as connection:

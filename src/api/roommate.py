@@ -16,7 +16,7 @@ class Roommate(BaseModel):
     last_name: str
     email: str
 
-@router.get("/get_roommate", tags=["roommate"])
+@router.get("/")
 def get_roommates():
     try:
         with db.engine.begin() as connection:
@@ -41,7 +41,7 @@ def get_roommates():
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while getting all roommates.")
 
-@router.post("/create_roommate", tags=["roommate"])
+@router.post("/")
 def create_roommate(new_roommate: Roommate):
     try:
         with db.engine.begin() as connection:
@@ -65,24 +65,32 @@ def create_roommate(new_roommate: Roommate):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a new roommate.")
 
-@router.post("/remove_roommate", tags=["roommate"])
+@router.delete("/roommates/{roommate_id}")
 def remove_roommate(roommate_id: int):
     try:
         with db.engine.begin() as connection:
             roommate_removed = connection.execute(
-                sqlalchemy.text(
-                    """
-                    DELETE
-                    FROM roommate
-                    WHERE id = :roommate_id
-                    RETURNING id, first_name, last_name, email
-                    """
-                ),
-                {
-                    "roommate_id": roommate_id
-                }
-            ).fetchone()
-        return {"roommate id": roommate_removed.id, "First Name": roommate_removed.first_name, "Last Name": roommate_removed.last_name, "Email": roommate_removed.email}
+            sqlalchemy.text(
+                """
+                DELETE
+                FROM roommate
+                WHERE id = :roommate_id
+                RETURNING id, first_name, last_name, email
+                """
+            ),
+            {
+                "roommate_id": roommate_id
+            }
+        ).fetchone()
+        if not roommate_removed:
+                raise HTTPException(status_code=404, detail="Roommate not found")
+        
+        return {
+            "roommate_id": roommate_removed.id,
+            "First Name": roommate_removed.first_name,
+            "Last Name": roommate_removed.last_name,
+            "Email": roommate_removed.email
+        }
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while removing a roommate.")
