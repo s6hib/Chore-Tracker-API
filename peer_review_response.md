@@ -25,6 +25,8 @@ Code review comments
 7. Added more error statements with proper error codes and descriptions to inform user the cause of the error.
 8. Refactored repetitive code where applicable.
 9. Dictionaries not necessary to replace if else statements
-10. Functions are broken down to as simple as possible as most just do a SQL query.
+10. Functions are broken down to as simple as possible as most just perform a SQL query and can't be in different functions.
 11. Tables can't be joined in existing queries given the relation of the query to the information wanted.
-12. 
+12. Added comments to db operations for clarity.
+13. Variables have descriptive names already.
+14. Could add constants for the default values but they are each only used once so it is unnecessary at the moment.
