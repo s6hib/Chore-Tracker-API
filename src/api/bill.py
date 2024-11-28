@@ -31,7 +31,7 @@ class Bill(BaseModel):
     bill_type: BillTypeEnum
     message: Optional[str]
 
-@router.post("/")
+@router.post("/create_bill/")
 def create_bill(bill_to_assign: Bill):
     try:
         with db.engine.begin() as connection:
@@ -212,7 +212,7 @@ class BillUpdate(BaseModel):
             }
         }
 
-@router.patch("/bills/{bill_id}", response_model=dict)
+@router.patch("/{bill_id}", response_model=dict)
 def update_bill(bill_id: int, bill_update: BillUpdate):
     update_fields = {}
     sql_set_clause = []
