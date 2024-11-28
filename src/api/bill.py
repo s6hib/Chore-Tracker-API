@@ -6,7 +6,7 @@ from enum import Enum
 import sqlalchemy
 from src import database as db
 from src.api.roommate import Roommate
-from typing import List, Optional
+from typing import Optional
 
 import math
 
@@ -33,120 +33,133 @@ class Bill(BaseModel):
 
 @router.post("/create_bill", tags=["bill"])
 def create_bill(bill_to_assign: Bill):
-    with db.engine.begin() as connection:
-        add_bill_query = connection.execute(sqlalchemy.text(
-            """
-            INSERT INTO bill(cost, due_date, bill_type, message)
-            VALUES (:cost, :due_date, :bill_type, :message)
-            RETURNING id;
-            """
-        ), 
-        {
-            "cost": bill_to_assign.cost,
-            "due_date": bill_to_assign.due_date,
-            "bill_type": bill_to_assign.bill_type.value,
-            "message": bill_to_assign.message
-        }
-        )
-        bill_id = add_bill_query.scalar_one()
-
-        roommates = connection.execute(sqlalchemy.text(
-            """
-            SELECT id FROM roommate
-            """
-        )).fetchall()
-
-        num_roommates = len(roommates)
-        if num_roommates == 0:
-            raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
-        cost_per_roommate = bill_to_assign.cost / num_roommates
-
-        cost_per_roommate_rounded_down = math.floor(cost_per_roommate * 100) / 100
-
-        cost_per_roommate_rounded_up = math.ceil(cost_per_roommate * 100) / 100
-
-        cents_over_cost = round((cost_per_roommate_rounded_up * num_roommates - bill_to_assign.cost) * 100)
-
-        print(f"cents over cost {cents_over_cost}")
-
-        for roommate in roommates:
-            if cents_over_cost > 0:
-                cost = cost_per_roommate_rounded_down
-                cents_over_cost -= 1
-            else:
-                cost = cost_per_roommate_rounded_up
-            connection.execute(sqlalchemy.text(
+    try:
+        with db.engine.begin() as connection:
+            add_bill_query = connection.execute(sqlalchemy.text(
                 """
-                INSERT INTO bill_list (roommate_id, bill_id, status, amount)
-                VALUES (:roommate_id, :bill_id, 'unpaid', :cost_per_roommate)
+                INSERT INTO bill(cost, due_date, bill_type, message)
+                VALUES (:cost, :due_date, :bill_type, :message)
+                RETURNING id;
                 """
-                ),{
-                    "roommate_id": roommate.id,
-                    "bill_id": bill_id,
-                    "cost_per_roommate" : cost
+            ), 
+            {
+                "cost": bill_to_assign.cost,
+                "due_date": bill_to_assign.due_date,
+                "bill_type": bill_to_assign.bill_type.value,
+                "message": bill_to_assign.message
+            }
+            )
+            bill_id = add_bill_query.scalar_one()
+
+            roommates = connection.execute(sqlalchemy.text(
+                """
+                SELECT id FROM roommate
+                """
+            )).fetchall()
+
+            num_roommates = len(roommates)
+            if num_roommates == 0:
+                raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
+            cost_per_roommate = bill_to_assign.cost / num_roommates
+
+            cost_per_roommate_rounded_down = math.floor(cost_per_roommate * 100) / 100
+
+            cost_per_roommate_rounded_up = math.ceil(cost_per_roommate * 100) / 100
+
+            cents_over_cost = round((cost_per_roommate_rounded_up * num_roommates - bill_to_assign.cost) * 100)
+
+            print(f"cents over cost {cents_over_cost}")
+
+            for roommate in roommates:
+                if cents_over_cost > 0:
+                    cost = cost_per_roommate_rounded_down
+                    cents_over_cost -= 1
+                else:
+                    cost = cost_per_roommate_rounded_up
+                connection.execute(sqlalchemy.text(
+                    """
+                    INSERT INTO bill_list (roommate_id, bill_id, status, amount)
+                    VALUES (:roommate_id, :bill_id, 'unpaid', :cost_per_roommate)
+                    """
+                    ),{
+                        "roommate_id": roommate.id,
+                        "bill_id": bill_id,
+                        "cost_per_roommate" : cost
+                    })
+
+            print(f"cost per roommate {cost_per_roommate}")
+                
+        return {
+            "bill_id": bill_id,
+            "message": "Bill created and assigned to roommates."
+        }   
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while creating a new bill")
+
+@router.get("/get_bills", tags=["bill"])
+def get_bills():
+    try:
+        with db.engine.begin() as connection:
+            result = connection.execute(sqlalchemy.text(
+                '''SELECT cost AS total_cost, due_date, bill_type, message,
+                b.roommate_id, b.status, (r.first_name || ' ' || r.last_name) AS fullname
+                FROM bill 
+                JOIN bill_list b ON b.bill_id = bill.id
+                JOIN roommate r ON r.id = b.roommate_id ''')).fetchall() 
+
+        bill_list = []
+
+        for bill in result:
+            bill_list.append({
+                "total_cost": bill.total_cost,
+                "due_date": bill.due_date,
+                "bill_type": bill.bill_type,
+                "message": bill.message,
+                "roommate_id": bill.roommate_id,
+                "roommate_name": bill.fullname,
+                "status": bill.status
                 })
+            print(bill)
 
-        print(f"cost per roommate {cost_per_roommate}")
-            
-    return {
-        "bill_id": bill_id,
-        "message": "Bill created and assigned to roommates."
-    }   
-
-
-@router.get("/get_bill", tags=["bill"])
-def get_bill():
-    with db.engine.begin() as connection:
-       result = connection.execute(sqlalchemy.text(
-            '''SELECT cost AS total_cost, due_date, bill_type, message,
-            b.roommate_id, b.status, (r.first_name || ' ' || r.last_name) AS fullname
-            FROM bill 
-            JOIN bill_list b ON b.bill_id = bill.id
-            JOIN roommate r ON r.id = b.roommate_id ''')).fetchall() 
-
-    bill_list = []
-
-    for bill in result:
-        bill_list.append({
-            "total_cost": bill.total_cost,
-            "due_date": bill.due_date,
-            "bill_type": bill.bill_type,
-            "message": bill.message,
-            "roommate_id": bill.roommate_id,
-            "roommate_name": bill.fullname,
-            "status": bill.status
-            })
-        print(bill)
-
-    return bill_list
+        return bill_list
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while getting all bills")
 
 @router.get("/{bill_id}/assignments", tags=["bill"])
 def get_bill_assignments(bill_id: int):
-    with db.engine.begin() as connection:
-        # Query all assignments for the specified bill_id
-        result = connection.execute(sqlalchemy.text(
-            """
-            SELECT roommate_id, status, amount
-            FROM bill_list
-            WHERE bill_id = :bill_id
-            """
-        ), {"bill_id": bill_id}).fetchall()
+    try:
+        with db.engine.begin() as connection:
+            # Query all assignments for the specified bill_id
+            result = connection.execute(sqlalchemy.text(
+                """
+                SELECT roommate_id, status, amount
+                FROM bill_list
+                WHERE bill_id = :bill_id
+                """
+            ), {"bill_id": bill_id}).fetchall()
 
-        # If no assignments are found, return an error
-        if not result:
-            raise HTTPException(status_code=404, detail="No assignments found for this bill.")
-    
-    bill_assignments = []
-    for bill in result:
-        bill_assignments.append({
-            "roommate_id": bill.roommate_id,
-            "status": bill.status,
-            "amount": bill.amount
-        })
+            # If no assignments are found, return an error
+            if not result:
+                raise HTTPException(status_code=404, detail="No assignments found for this bill.")
+        
+        bill_assignments = []
+        for bill in result:
+            bill_assignments.append({
+                "roommate_id": bill.roommate_id,
+                "status": bill.status,
+                "amount": bill.amount
+            })
 
-    print(bill_assignments)
+        print(bill_assignments)
+        
+        return {"bill_id": bill_id, "assignments": bill_assignments}
     
-    return {"bill_id": bill_id, "assignments": bill_assignments}
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while getting bill assignments")
 
 class StatusEnum(str, Enum):
     unpaid = 'unpaid'
@@ -158,24 +171,30 @@ class PaymentUpdate(BaseModel):
 
 @router.patch("/update_bill_list_status/{bill_id}/payments/{roommate_id}", tags=["bill"])
 def update_bill_list_status(bill_id: int, roommate_id: int, payment_update: PaymentUpdate):
-    with db.engine.begin() as connection:     
-       result = connection.execute(sqlalchemy.text(
-           """
-            UPDATE bill_list
-            SET status =:status,
-                amount = CASE WHEN :status = 'paid' THEN 0 ELSE amount END
-            WHERE bill_id = :bill_id AND roommate_id = :roommate_id
+    try:
+        with db.engine.begin() as connection:     
+            result = connection.execute(sqlalchemy.text(
             """
+                UPDATE bill_list
+                SET status =:status,
+                    amount = CASE WHEN :status = 'paid' THEN 0 ELSE amount END
+                WHERE bill_id = :bill_id AND roommate_id = :roommate_id
+                """
 
-      ), {
-          "bill_id" : bill_id, 
-          "roommate_id" : roommate_id,
-          "status" : payment_update.status.value
-        })
-       if result.rowcount == 0:
-           return {"message": "No bill found with the specified ID."}
+        ), {
+            "bill_id" : bill_id, 
+            "roommate_id" : roommate_id,
+            "status" : payment_update.status.value
+            })
+        if result.rowcount == 0:
+            return {"message": "No bill found with the specified ID."}
 
-    return {"message": f"Payment status for roommate id {roommate_id} on bill id {bill_id} updated to {payment_update.status.value}."}
+        return {"message": f"Payment status for roommate id {roommate_id} on bill id {bill_id} updated to {payment_update.status.value}."}
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while updating the bill status")
+
 
 class BillUpdate(BaseModel):
     due_date: Optional[datetime.date] = Field(None, example="YYYY-MM-DD")  # Placeholder for date
@@ -219,17 +238,21 @@ def update_bill(bill_id: int, bill_update: BillUpdate):
 
     sql_set_clause_str = ",".join(sql_set_clause)
     
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(
-            f"""
-            UPDATE bill
-            SET {sql_set_clause_str}
-            WHERE id = :bill_id
-            """
-        ), {
-            "bill_id": bill_id, **update_fields
-        })
+    try:
+        with db.engine.begin() as connection:
+            result = connection.execute(sqlalchemy.text(
+                f"""
+                UPDATE bill
+                SET {sql_set_clause_str}
+                WHERE id = :bill_id
+                """
+            ), {
+                "bill_id": bill_id, **update_fields
+            })
 
-        if result.rowcount == 0:
-            return {"message": "There is no bill with the bill id you provided."}
-    return {"message": f"Bill ID: {bill_id} is updated successfully."}
+            if result.rowcount == 0:
+                return {"message": "There is no bill with the bill id you provided."}
+        return {"message": f"Bill ID: {bill_id} is updated successfully."}
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while updating the bill information")
