@@ -1,4 +1,4 @@
-from fastapi import HTTPException, APIRouter, Depends
+from fastapi import HTTPException, APIRouter, Depends, Path
 from pydantic import BaseModel, Field
 from src.api import auth
 import datetime
@@ -26,12 +26,18 @@ class BillTypeEnum(str, Enum):
     groceries = 'groceries'
 
 class Bill(BaseModel):
-    cost: float
+    # TEMPORARY COMMENT TO EXPLAIN THE NEW CHANGE REGARDING VALIDATION, WILL REMOVE LATER:
+
+    # Field(...): Adds additional constraints and metadata to the cost field
+    # ...: indicates the field is required (no default value at the moment)
+    # gt=0: ensures the cost value must be greater than 0
+    # description: take a guess what this field is for :P
+    cost: float = Field(..., gt=0, description="Bill cost must be greater than 0")
     due_date: datetime.date
     bill_type: BillTypeEnum
     message: Optional[str]
 
-@router.post("/create_bill/")
+@router.post("/")
 def create_bill(bill_to_assign: Bill):
     try:
         with db.engine.begin() as connection:
@@ -90,7 +96,8 @@ def create_bill(bill_to_assign: Bill):
             print(f"cost per roommate {cost_per_roommate}")
                 
         return {
-            "bill_id": bill_id,
+            "status": "success",
+            "data": {"bill_id": bill_id},
             "message": "Bill created and assigned to roommates."
         }   
     
@@ -98,7 +105,7 @@ def create_bill(bill_to_assign: Bill):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a new bill")
 
-@router.get("/get_bills", tags=["bill"])
+@router.get("/", tags=["bill"])
 def get_bills():
     try:
         with db.engine.begin() as connection:
@@ -109,8 +116,14 @@ def get_bills():
                 JOIN bill_list b ON b.bill_id = bill.id
                 JOIN roommate r ON r.id = b.roommate_id ''')).fetchall() 
 
-        bill_list = []
+        if not result:
+            return {
+                "status": "success",
+                "data": [],
+                "message": "No bills found"
+            }
 
+        bill_list = []
         for bill in result:
             bill_list.append({
                 "total_cost": bill.total_cost,
@@ -123,13 +136,19 @@ def get_bills():
                 })
             print(bill)
 
-        return bill_list
+        return {
+            "status": "success",
+            "data": bill_list,
+            "message": None
+        }
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while getting all bills")
 
 @router.get("/{bill_id}/assignments")
-def get_bill_assignments(bill_id: int):
+def get_bill_assignments(
+    bill_id: int = Path(..., gt=0, description="The ID of the bill to get assignments for")
+):
     try:
         with db.engine.begin() as connection:
             # Query all assignments for the specified bill_id
@@ -155,7 +174,11 @@ def get_bill_assignments(bill_id: int):
 
         print(bill_assignments)
         
-        return {"bill_id": bill_id, "assignments": bill_assignments}
+        return {
+            "status": "success",
+            "data": {"bill_id": bill_id, "assignments": bill_assignments},
+            "message": None
+        }
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -170,9 +193,27 @@ class PaymentUpdate(BaseModel):
     status: StatusEnum
 
 @router.patch("/{bill_id}/payments/{roommate_id}")
-def update_bill_list_status(bill_id: int, roommate_id: int, payment_update: PaymentUpdate):
+def update_bill_list_status(
+    bill_id: int = Path(..., gt=0, description="The ID of the bill to update"),
+    roommate_id: int = Path(..., gt=0, description="The ID of the roommate to update"),
+    payment_update: PaymentUpdate = None
+):
     try:
         with db.engine.begin() as connection:     
+            # validate bill_id and roommate_id exist
+            exists = connection.execute(sqlalchemy.text(
+                """
+                SELECT 1 FROM bill_list 
+                WHERE bill_id = :bill_id AND roommate_id = :roommate_id
+                """
+            ), {
+                "bill_id": bill_id,
+                "roommate_id": roommate_id
+            }).first()
+            
+            if not exists:
+                raise HTTPException(status_code=404, detail="Bill assignment not found for the specified bill and roommate")
+
             result = connection.execute(sqlalchemy.text(
             """
                 UPDATE bill_list
@@ -180,17 +221,20 @@ def update_bill_list_status(bill_id: int, roommate_id: int, payment_update: Paym
                     amount = CASE WHEN :status = 'paid' THEN 0 ELSE amount END
                 WHERE bill_id = :bill_id AND roommate_id = :roommate_id
                 """
-
-        ), {
-            "bill_id" : bill_id, 
-            "roommate_id" : roommate_id,
-            "status" : payment_update.status.value
+            ), {
+                "bill_id" : bill_id, 
+                "roommate_id" : roommate_id,
+                "status" : payment_update.status.value
             })
-        if result.rowcount == 0:
-            return {"message": "No bill found with the specified ID."}
 
-        return {"message": f"Payment status for roommate id {roommate_id} on bill id {bill_id} updated to {payment_update.status.value}."}
+        return {
+            "status": "success",
+            "data": None,
+            "message": f"Payment status for roommate id {roommate_id} on bill id {bill_id} updated to {payment_update.status.value}."
+        }
     
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while updating the bill status")
@@ -207,13 +251,16 @@ class BillUpdate(BaseModel):
             "example": {
                 "due_date": "2024-12-31",      # Example date format
                 #"cost": 0.0,                 # Example cost
-                "bill_type": "string",         # Placeholder to show it’s a string field
+                "bill_type": "string",         # Placeholder to show it's a string field
                 "message": "string"            # Placeholder for a generic text field
             }
         }
 
-@router.patch("/{bill_id}", response_model=dict)
-def update_bill(bill_id: int, bill_update: BillUpdate):
+@router.patch("/bills/{bill_id}", response_model=dict)
+def update_bill(
+    bill_id: int = Path(..., gt=0, description="The ID of the bill to update"),
+    bill_update: BillUpdate = None
+):
     update_fields = {}
     sql_set_clause = []
 
@@ -234,7 +281,11 @@ def update_bill(bill_id: int, bill_update: BillUpdate):
         update_fields["message"] = bill_update.message
     
     if not sql_set_clause:
-        return {"message": "You are not changing anything~"}
+        return {
+            "status": "success",
+            "data": None,
+            "message": "No changes requested"
+        }
 
     sql_set_clause_str = ",".join(sql_set_clause)
     
@@ -251,8 +302,15 @@ def update_bill(bill_id: int, bill_update: BillUpdate):
             })
 
             if result.rowcount == 0:
-                return {"message": "There is no bill with the bill id you provided."}
-        return {"message": f"Bill ID: {bill_id} is updated successfully."}
+                raise HTTPException(status_code=404, detail="No bill found with the specified ID")
+
+        return {
+            "status": "success",
+            "data": None,
+            "message": f"Bill ID: {bill_id} updated successfully"
+        }
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while updating the bill information")
