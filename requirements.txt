@@ -5,3 +5,7 @@ sqlalchemy
 psycopg2-binary~=2.9.3
 python-dotenv
 pre-commit
+
+# For faking data
+Faker
+numpy
