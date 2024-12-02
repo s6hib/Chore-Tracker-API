@@ -31,12 +31,16 @@ router = APIRouter(
 
 @router.post("/create_chore/")
 def create_chore(chore: Chore):
-    if (chore.priority != 1 or chore.priority != 2 or chore.priority != 3 
-        or chore.priority != 4 or chore.priority != 5):
+    if (chore.priority != 1 and chore.priority != 2 and chore.priority != 3 
+        and chore.priority != 4 and chore.priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
-    if (chore.priority != "daily" or chore.priority != "weekly" or chore.priority != "biweekly"
-        or chore.priority != "monthly" or chore.priority != "bimonthly" or chore.priority != "yearly" ):
-        raise HTTPException(status_code=500, detail="Chore frequency must be one of these: daily, weekly, biweekly, monthly, bimonthly, yearly")
+    
+    if (chore.due_date < datetime.date.today()):
+        raise HTTPException(status_code=400, detail="Due date cannot be in the past")
+    
+    if (chore.frequency != "daily" and chore.frequency != "weekly" and chore.frequency != "biweekly"
+        and chore.frequency != "monthly" and chore.frequency != "bimonthly" and chore.frequency != "yearly" ):
+        raise HTTPException(status_code=400, detail="Chore frequency must be one of these: daily, weekly, biweekly, monthly, bimonthly, or yearly")
     try:
         with db.engine.begin() as connection:
             result = connection.execute(sqlalchemy.text(
@@ -63,11 +67,33 @@ def create_chore(chore: Chore):
 
 @router.post("/update_chore_priority", tags=["chore"])
 def update_chore_priority(new_priority: int, chore_id: int):
-    if (chore.priority != 1 or chore.priority != 2 or chore.priority != 3 
-        or chore.priority != 4 or chore.priority != 5):
+    if (new_priority != 1 and new_priority != 2 and new_priority != 3 
+        and new_priority != 4 and new_priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
+    
     try:
         with db.engine.begin() as connection:
+
+            chore_id_exists = connection.execute(sqlalchemy.text(
+                """
+                SELECT id
+                FROM chore
+                WHERE id = :chore_id;
+                """),
+                {
+                    "chore_id": chore_id
+                }).fetchall()
+        if not chore_id_exists:
+            raise Exception
+            
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Chore_id does not exist")
+    
+    print("go here")
+            
+    try:
+        with db.engine.begin() as connection:
+            
             connection.execute(sqlalchemy.text(
                 """
                 UPDATE chore 
@@ -131,42 +157,3 @@ def get_chores(priority: Optional[int] = None):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while returning all chores (with specified priority)")
 
-@router.get("/30_day_chore_history")
-def get_chore_history():
-    # calculate date 30 days ago
-    thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
-    
-    try:
-        with db.engine.begin() as connection:
-            result = connection.execute(sqlalchemy.text(
-                '''
-                SELECT 
-                    c.name as chore_name,
-                    r.first_name,
-                    r.last_name,
-                    ca.status,
-                    c.due_date as completion_date
-                FROM chore c
-                JOIN chore_assignment ca ON c.id = ca.chore_id
-                JOIN roommate r ON ca.roommate_id = r.id
-                WHERE ca.status = 'completed'
-                AND c.due_date >= :thirty_days_ago
-                ORDER BY c.due_date DESC
-                '''
-            ), {
-                "thirty_days_ago": thirty_days_ago
-            }).fetchall()
-        
-        history_list = []
-        for record in result:
-            history_list.append({
-                "title": record.chore_name,
-                "completed_by": f"{record.first_name} {record.last_name}",
-                "completion_date": record.completion_date  # removed strftime formatting to show full date
-            })
-        
-        return history_list
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while getting the chores completed in the last 30 days")

@@ -110,11 +110,8 @@ def get_bills():
     try:
         with db.engine.begin() as connection:
             result = connection.execute(sqlalchemy.text(
-                '''SELECT cost AS total_cost, due_date, bill_type, message,
-                b.roommate_id, b.status, (r.first_name || ' ' || r.last_name) AS fullname
-                FROM bill 
-                JOIN bill_list b ON b.bill_id = bill.id
-                JOIN roommate r ON r.id = b.roommate_id ''')).fetchall() 
+                '''SELECT id AS bill_id, cost AS total_cost, due_date, bill_type, message
+                FROM bill''')).fetchall() 
 
         if not result:
             return {
@@ -126,13 +123,11 @@ def get_bills():
         bill_list = []
         for bill in result:
             bill_list.append({
+                "bill_id": bill.bill_id,
                 "total_cost": bill.total_cost,
                 "due_date": bill.due_date,
                 "bill_type": bill.bill_type,
-                "message": bill.message,
-                "roommate_id": bill.roommate_id,
-                "roommate_name": bill.fullname,
-                "status": bill.status
+                "message": bill.message
                 })
             print(bill)
 
@@ -147,97 +142,86 @@ def get_bills():
 
 @router.get("/{bill_id}/assignments")
 def get_bill_assignments(
-    bill_id: int = Path(..., gt=0, description="The ID of the bill to get assignments for")
-):
-    try:
-        with db.engine.begin() as connection:
-            # Query all assignments for the specified bill_id
-            result = connection.execute(sqlalchemy.text(
-                """
-                SELECT roommate_id, status, amount
-                FROM bill_list
-                WHERE bill_id = :bill_id
-                """
-            ), {"bill_id": bill_id}).fetchall()
+    bill_id: int = Path(..., gt=0, description="The ID of the bill to get assignments for")):
 
-            # If no assignments are found, return an error
-            if not result:
-                raise HTTPException(status_code=404, detail="No assignments found for this bill.")
-        
-        bill_assignments = []
-        for bill in result:
-            bill_assignments.append({
-                "roommate_id": bill.roommate_id,
-                "status": bill.status,
-                "amount": bill.amount
-            })
+    with db.engine.begin() as connection:
+        # Query all assignments for the specified bill_id
+        result = connection.execute(sqlalchemy.text(
+            """
+            SELECT roommate_id, CONCAT(first_name, ' ', last_name) AS full_name, status, amount
+            FROM bill_list
+            JOIN roommate
+                ON roommate.id = bill_list.roommate_id
+            WHERE bill_id = :bill_id
+            """
+        ), {"bill_id": bill_id}).fetchall()
 
-        print(bill_assignments)
-        
-        return {
-            "status": "success",
-            "data": {"bill_id": bill_id, "assignments": bill_assignments},
-            "message": None
-        }
+        # If no assignments are found, return an error
+        if not result:
+            raise HTTPException(status_code=404, detail="No assignments found for this bill.")
     
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while getting bill assignments")
+    bill_assignments = []
+    for bill in result:
+        bill_assignments.append({
+            "roommate_id": bill.roommate_id,
+            "name": bill.full_name,
+            "status": bill.status,
+            "amount": bill.amount
+        })
+
+    print(bill_assignments)
+    
+    return {
+        "status": "success",
+        "data": {"bill_id": bill_id, "assignments": bill_assignments},
+        "message": None
+    }
 
 class StatusEnum(str, Enum):
     unpaid = 'unpaid'
     paid = 'paid'
     overdue = 'overdue'
 
-class PaymentUpdate(BaseModel):
-    status: StatusEnum
 
 @router.patch("/{bill_id}/payments/{roommate_id}")
 def update_bill_list_status(
     bill_id: int = Path(..., gt=0, description="The ID of the bill to update"),
     roommate_id: int = Path(..., gt=0, description="The ID of the roommate to update"),
-    payment_update: PaymentUpdate = None
+    payment_update: StatusEnum = 'unpaid'
 ):
-    try:
-        with db.engine.begin() as connection:     
-            # validate bill_id and roommate_id exist
-            exists = connection.execute(sqlalchemy.text(
-                """
-                SELECT 1 FROM bill_list 
-                WHERE bill_id = :bill_id AND roommate_id = :roommate_id
-                """
-            ), {
-                "bill_id": bill_id,
-                "roommate_id": roommate_id
-            }).first()
-            
-            if not exists:
-                raise HTTPException(status_code=404, detail="Bill assignment not found for the specified bill and roommate")
-
-            result = connection.execute(sqlalchemy.text(
+    with db.engine.begin() as connection:     
+        # validate bill_id and roommate_id exist
+        exists = connection.execute(sqlalchemy.text(
             """
-                UPDATE bill_list
-                SET status =:status,
-                    amount = CASE WHEN :status = 'paid' THEN 0 ELSE amount END
-                WHERE bill_id = :bill_id AND roommate_id = :roommate_id
-                """
-            ), {
-                "bill_id" : bill_id, 
-                "roommate_id" : roommate_id,
-                "status" : payment_update.status.value
-            })
+            SELECT 1 FROM bill_list 
+            WHERE bill_id = :bill_id AND roommate_id = :roommate_id
+            """
+        ), {
+            "bill_id": bill_id,
+            "roommate_id": roommate_id
+        }).first()
+        
+        if not exists:
+            raise HTTPException(status_code=404, detail="Bill assignment not found for the specified bill and roommate")
 
-        return {
-            "status": "success",
-            "data": None,
-            "message": f"Payment status for roommate id {roommate_id} on bill id {bill_id} updated to {payment_update.status.value}."
-        }
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while updating the bill status")
+        result = connection.execute(sqlalchemy.text(
+        """
+            UPDATE bill_list
+            SET status =:status,
+                amount = CASE WHEN :status = 'paid' THEN 0 ELSE amount END
+            WHERE bill_id = :bill_id AND roommate_id = :roommate_id
+            """
+        ), {
+            "bill_id" : bill_id, 
+            "roommate_id" : roommate_id,
+            "status" : payment_update
+        })
+
+    return {
+        "status": "success",
+        "data": None,
+        "message": f"Payment status for roommate id {roommate_id} on bill id {bill_id} updated to {payment_update}."
+    }
 
 
 class BillUpdate(BaseModel):

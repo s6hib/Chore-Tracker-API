@@ -85,7 +85,7 @@ def remove_roommate(roommate_id: int):
         if not roommate_removed:
                 raise HTTPException(status_code=404, detail="Roommate not found")
         
-        return {
+        return "Roommate successfully deleted", {
             "roommate_id": roommate_removed.id,
             "First Name": roommate_removed.first_name,
             "Last Name": roommate_removed.last_name,
