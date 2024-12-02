@@ -29,7 +29,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.post("/create_chore/")
+@router.post("/")
 def create_chore(chore: Chore):
     if (chore.priority != 1 and chore.priority != 2 and chore.priority != 3 
         and chore.priority != 4 and chore.priority != 5):
@@ -65,7 +65,7 @@ def create_chore(chore: Chore):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a chore")
 
-@router.post("/update_chore_priority", tags=["chore"])
+@router.post("/update_chore_priority")
 def update_chore_priority(new_priority: int, chore_id: int):
     if (new_priority != 1 and new_priority != 2 and new_priority != 3 
         and new_priority != 4 and new_priority != 5):
@@ -119,7 +119,7 @@ def update_chore_priority(new_priority: int, chore_id: int):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while updating the chore priority")
 
-@router.get("/get_chores/")
+@router.get("/")
 def get_chores(priority: Optional[int] = None):
     try:
         with db.engine.begin() as connection:

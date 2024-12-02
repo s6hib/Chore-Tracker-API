@@ -105,7 +105,7 @@ def create_bill(bill_to_assign: Bill):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a new bill")
 
-@router.get("/", tags=["bill"])
+@router.get("/")
 def get_bills():
     try:
         with db.engine.begin() as connection:
