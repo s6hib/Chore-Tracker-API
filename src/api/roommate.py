@@ -16,7 +16,7 @@ class Roommate(BaseModel):
     last_name: str
     email: str
 
-@router.get("/get_roommates/")
+@router.get("/")
 def get_roommates():
     try:
         with db.engine.begin() as connection:
@@ -41,7 +41,7 @@ def get_roommates():
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while getting all roommates.")
 
-@router.post("/create_roommate/")
+@router.post("/")
 def create_roommate(new_roommate: Roommate):
     try:
         with db.engine.begin() as connection:
@@ -65,7 +65,7 @@ def create_roommate(new_roommate: Roommate):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a new roommate.")
 
-@router.delete("/delete_roommate/{roommate_id}")
+@router.delete("/roommates/{roommate_id}")
 def remove_roommate(roommate_id: int):
     try:
         with db.engine.begin() as connection:
