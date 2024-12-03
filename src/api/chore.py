@@ -15,13 +15,6 @@ class FrequencyEnum(str, Enum):
     bimonthly = 'bimonthly'
     yearly = 'yearly'
 
-class priorityEnum(int, Enum):
-    one = 1
-    two = 2
-    three = 3
-    four = 4
-    five = 5
-
 class Chore(BaseModel):
     name: str
     location_in_house: str
@@ -37,7 +30,7 @@ router = APIRouter(
 )
 
 @router.post("/")
-def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, duration_mins: int, priority: priorityEnum, due_date: datetime.date):
+def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, duration_mins: int, priority: int, due_date: datetime.date = datetime.date.today()):
     if (priority != 1 and priority != 2 and priority != 3 
         and priority != 4 and priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
@@ -73,7 +66,7 @@ def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, du
         raise HTTPException(status_code=500, detail="An error occurred while creating a chore")
 
 @router.post("/update_chore_priority")
-def update_chore_priority(new_priority: priorityEnum, chore_id: int):
+def update_chore_priority(new_priority: int, chore_id: int):
     if (new_priority != 1 and new_priority != 2 and new_priority != 3 
         and new_priority != 4 and new_priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
@@ -127,7 +120,7 @@ def update_chore_priority(new_priority: priorityEnum, chore_id: int):
         raise HTTPException(status_code=500, detail="An error occurred while updating the chore priority")
 
 @router.get("/")
-def get_chores(priority: Optional[priorityEnum] = None):
+def get_chores(priority: Optional[int] = None):
     try:
         with db.engine.begin() as connection:
             if priority is not None:
