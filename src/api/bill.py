@@ -38,72 +38,78 @@ class Bill(BaseModel):
     message: Optional[str]
 
 @router.post("/")
-def create_bill(bill_to_assign: Bill):
-    try:
-        with db.engine.begin() as connection:
-            add_bill_query = connection.execute(sqlalchemy.text(
-                """
-                INSERT INTO bill(cost, due_date, bill_type, message)
-                VALUES (:cost, :due_date, :bill_type, :message)
-                RETURNING id;
-                """
-            ), 
-            {
-                "cost": bill_to_assign.cost,
-                "due_date": bill_to_assign.due_date,
-                "bill_type": bill_to_assign.bill_type.value,
-                "message": bill_to_assign.message
-            }
-            )
-            bill_id = add_bill_query.scalar_one()
+def create_bill(cost: float = 0.50, #= Path(..., gt=0, description="Bill cost must be greater than 0"), 
+                due_date: datetime.date = datetime.date.today(), 
+                bill_type: BillTypeEnum = '', 
+                message: Optional[str] = ''):
 
-            roommates = connection.execute(sqlalchemy.text(
-                """
-                SELECT id FROM roommate
-                """
-            )).fetchall()
-
-            num_roommates = len(roommates)
-            if num_roommates == 0:
-                raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
-            cost_per_roommate = bill_to_assign.cost / num_roommates
-
-            cost_per_roommate_rounded_down = math.floor(cost_per_roommate * 100) / 100
-
-            cost_per_roommate_rounded_up = math.ceil(cost_per_roommate * 100) / 100
-
-            cents_over_cost = round((cost_per_roommate_rounded_up * num_roommates - bill_to_assign.cost) * 100)
-
-            print(f"cents over cost {cents_over_cost}")
-
-            for roommate in roommates:
-                if cents_over_cost > 0:
-                    cost = cost_per_roommate_rounded_down
-                    cents_over_cost -= 1
-                else:
-                    cost = cost_per_roommate_rounded_up
-                connection.execute(sqlalchemy.text(
-                    """
-                    INSERT INTO bill_list (roommate_id, bill_id, status, amount)
-                    VALUES (:roommate_id, :bill_id, 'unpaid', :cost_per_roommate)
-                    """
-                    ),{
-                        "roommate_id": roommate.id,
-                        "bill_id": bill_id,
-                        "cost_per_roommate" : cost
-                    })
-
-            print(f"cost per roommate {cost_per_roommate}")
-                
-        return {
-            "status": "success",
-            "data": {"bill_id": bill_id},
-            "message": "Bill created and assigned to roommates."
-        }   
+    if (bill_type != "electricity" and bill_type != "water" and bill_type != "internet"
+        and bill_type != "rent" and bill_type != "gas" and bill_type != "trash" and bill_type != "groceries"):
+        raise HTTPException(status_code=400, detail="Bill_type must be one of these: electricity, water, internet, rent, gas, trash, or groceries")
     
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while creating a new bill")
+    if (cost <=0):
+        raise HTTPException(status_code=400, detail="Bill cost must be greater than 0")
+
+    with db.engine.begin() as connection:
+        add_bill_query = connection.execute(sqlalchemy.text(
+            """
+            INSERT INTO bill(cost, due_date, bill_type, message)
+            VALUES (:cost, :due_date, :bill_type, :message)
+            RETURNING id;
+            """
+        ), 
+        {
+            "cost": cost,
+            "due_date": due_date,
+            "bill_type": bill_type,
+            "message": message
+        }
+        )
+        bill_id = add_bill_query.scalar_one()
+
+        roommates = connection.execute(sqlalchemy.text(
+            """
+            SELECT id FROM roommate
+            """
+        )).fetchall()
+
+        num_roommates = len(roommates)
+        if num_roommates == 0:
+            raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
+        cost_per_roommate = cost / num_roommates
+
+        cost_per_roommate_rounded_down = math.floor(cost_per_roommate * 100) / 100
+
+        cost_per_roommate_rounded_up = math.ceil(cost_per_roommate * 100) / 100
+
+        cents_over_cost = round((cost_per_roommate_rounded_up * num_roommates - cost) * 100)
+
+        print(f"cents over cost {cents_over_cost}")
+
+        for roommate in roommates:
+            if cents_over_cost > 0:
+                cost = cost_per_roommate_rounded_down
+                cents_over_cost -= 1
+            else:
+                cost = cost_per_roommate_rounded_up
+            connection.execute(sqlalchemy.text(
+                """
+                INSERT INTO bill_list (roommate_id, bill_id, status, amount)
+                VALUES (:roommate_id, :bill_id, 'unpaid', :cost_per_roommate)
+                """
+                ),{
+                    "roommate_id": roommate.id,
+                    "bill_id": bill_id,
+                    "cost_per_roommate" : cost
+                })
+
+        print(f"cost per roommate {cost_per_roommate}")
+            
+    return {
+        "status": "success",
+        "data": {"bill_id": bill_id},
+        "message": "Bill created and assigned to roommates."
+    }   
 
 @router.get("/")
 def get_bills():
@@ -187,8 +193,11 @@ class StatusEnum(str, Enum):
 def update_bill_list_status(
     bill_id: int = Path(..., gt=0, description="The ID of the bill to update"),
     roommate_id: int = Path(..., gt=0, description="The ID of the roommate to update"),
-    payment_update: StatusEnum = 'unpaid'
+    payment_update: StatusEnum = ''
 ):
+    if (payment_update != "paid" and payment_update != "unpaid" and payment_update != "overdue"):
+        raise HTTPException(status_code=400, detail="payment_update must be one of these: unpaid, paid, overdue")
+
     with db.engine.begin() as connection:     
         # validate bill_id and roommate_id exist
         exists = connection.execute(sqlalchemy.text(
@@ -243,26 +252,33 @@ class BillUpdate(BaseModel):
 @router.patch("/bills/{bill_id}", response_model=dict)
 def update_bill(
     bill_id: int = Path(..., gt=0, description="The ID of the bill to update"),
-    bill_update: BillUpdate = None
+    due_date: datetime.date = datetime.date.today(),
+    bill_type: BillTypeEnum = '',
+    message: str = ''
 ):
+    
+    if (bill_type != "electricity" and bill_type != "water" and bill_type != "internet"
+        and bill_type != "rent" and bill_type != "gas" and bill_type != "trash" and bill_type != "groceries"):
+        raise HTTPException(status_code=400, detail="Bill_type must be one of these: electricity, water, internet, rent, gas, trash, or groceries")
+    
     update_fields = {}
     sql_set_clause = []
 
-    if bill_update.due_date is not None:
+    if due_date is not None:
         sql_set_clause.append("due_date =:due_date")
-        update_fields["due_date"] = bill_update.due_date
+        update_fields["due_date"] = due_date
 
-    # if bill_update.cost is not None:
+    # if cost is not None:
     #     sql_set_clause.append("cost =:cost")
-    #     update_fields["cost"] = bill_update.cost
+    #     update_fields["cost"] = cost
     
-    if bill_update.bill_type is not None:
+    if bill_type is not None:
         sql_set_clause.append("bill_type = :bill_type")
-        update_fields["bill_type"] = bill_update.bill_type.value
+        update_fields["bill_type"] = bill_type
 
-    if bill_update.message is not None:
+    if message is not None:
         sql_set_clause.append("message =:message")
-        update_fields["message"] = bill_update.message
+        update_fields["message"] = message
     
     if not sql_set_clause:
         return {

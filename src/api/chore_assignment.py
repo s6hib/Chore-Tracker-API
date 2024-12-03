@@ -1,3 +1,4 @@
+from enum import Enum
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
@@ -14,13 +15,11 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-# class ChoreAssignment(BaseModel):
-#     chore_id: int
-#     roommate_id: int
-#     status: str = "pending"
+class ChoreStatusEnum(str, Enum):
+    pending = "pending"
+    in_progress = 'in_progress'
+    completed = 'completed'
 
-# class ChoreStatusUpdate(BaseModel):
-#     status: str
 
 @router.post("/{chore_id}/assignments")
 def assign_chore(chore_id: int, roommate_id: int):
@@ -78,7 +77,7 @@ def assign_chore(chore_id: int, roommate_id: int):
 
 
 @router.patch("/{chore_id}/assignments/{roommate_id}/status")
-def update_chore_status(chore_id: int, roommate_id: int, status_update: str):
+def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreStatusEnum):
     print(status_update)
     if (status_update != "pending" and status_update != "in_progress" and status_update != "completed"):
         raise HTTPException(status_code=400, detail="Chore assignment status must be 'pending', 'in_progress', or 'completed'")
