@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.api import auth
 from pydantic import BaseModel
+import time
 
 import sqlalchemy
 from src import database as db
@@ -18,6 +19,8 @@ class Roommate(BaseModel):
 
 @router.get("/")
 def get_roommates():
+    start_time = time.time()
+
     try:
         with db.engine.begin() as connection:
             result = connection.execute(
@@ -36,6 +39,10 @@ def get_roommates():
                 "email": roommate.email
             })
         
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+
         return roommate_list
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -43,8 +50,26 @@ def get_roommates():
 
 @router.post("/")
 def create_roommate(new_roommate: Roommate):
+    start_time = time.time()
     try:
         with db.engine.begin() as connection:
+            # Check if roommate with same email already exists
+            existing_roommate = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT id FROM roommate 
+                    WHERE email = :email
+                    """
+                ),
+                {"email": new_roommate.email}
+            ).fetchone()
+            
+            if existing_roommate:
+                raise HTTPException(
+                    status_code=400,
+                    detail="A roommate with this email already exists"
+                )
+
             roommate_id = connection.execute(
                 sqlalchemy.text(
                     """
@@ -59,14 +84,21 @@ def create_roommate(new_roommate: Roommate):
                     "email": new_roommate.email
                 }
             ).fetchone()
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
         return {"First Name": new_roommate.first_name, "Last Name": new_roommate.last_name, "Email": new_roommate.email, "roommate id": roommate_id.id}
 
+    except HTTPException as he:
+        raise he
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a new roommate.")
 
 @router.delete("/roommates/{roommate_id}")
 def remove_roommate(roommate_id: int):
+    start_time = time.time()
+
     try:
         with db.engine.begin() as connection:
             roommate_removed = connection.execute(
@@ -84,6 +116,10 @@ def remove_roommate(roommate_id: int):
         ).fetchone()
         if not roommate_removed:
                 raise HTTPException(status_code=404, detail="Roommate not found")
+        
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
         
         return "Roommate successfully deleted", {
             "roommate_id": roommate_removed.id,

@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.api import auth
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import datetime
 from enum import Enum
 import sqlalchemy
 from src import database as db
 from typing import Optional
+import time
 
 class FrequencyEnum(str, Enum):
     daily = 'daily'
@@ -20,7 +21,7 @@ class Chore(BaseModel):
     location_in_house: str
     frequency: FrequencyEnum
     duration_mins: int
-    priority: int
+    priority: int = Field(..., ge=1, le=5, description="Priority must be between 1 and 5")
     due_date: datetime.date
 
 router = APIRouter(
@@ -30,16 +31,19 @@ router = APIRouter(
 )
 
 @router.post("/")
-def create_chore(chore: Chore):
-    if (chore.priority != 1 and chore.priority != 2 and chore.priority != 3 
-        and chore.priority != 4 and chore.priority != 5):
+def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, duration_mins: int, priority: int, due_date: datetime.date = datetime.date.today()):
+    start_time = time.time()  # Start the timer
+
+    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+    if (priority != 1 and priority != 2 and priority != 3 
+        and priority != 4 and priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
     
-    if (chore.due_date < datetime.date.today()):
+    if (due_date < datetime.date.today()):
         raise HTTPException(status_code=400, detail="Due date cannot be in the past")
     
-    if (chore.frequency != "daily" and chore.frequency != "weekly" and chore.frequency != "biweekly"
-        and chore.frequency != "monthly" and chore.frequency != "bimonthly" and chore.frequency != "yearly" ):
+    if (frequency != "daily" and frequency != "weekly" and frequency != "biweekly"
+        and frequency != "monthly" and frequency != "bimonthly" and frequency != "yearly" ):
         raise HTTPException(status_code=400, detail="Chore frequency must be one of these: daily, weekly, biweekly, monthly, bimonthly, or yearly")
     try:
         with db.engine.begin() as connection:
@@ -50,23 +54,29 @@ def create_chore(chore: Chore):
                 RETURNING id
                 """
             ),{
-                "name": chore.name,
-                "location_in_house": chore.location_in_house,
-                "frequency": chore.frequency.value,
-                "duration_mins": chore.duration_mins,
-                "priority": chore.priority, # from 1 to 5 only or it will cause an error
-                "due_date": chore.due_date
+                "name": name,
+                "location_in_house": location_in_house,
+                "frequency": frequency.value,
+                "duration_mins": duration_mins,
+                "priority": priority, # from 1 to 5 only or it will cause an error
+                "due_date": due_date
             })
         
         chore_id = result.scalar_one()
-        
-        return {"message": f"Chore {chore.name} created successully.", "chore_id": chore_id }
+
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+            
+        return {"message": f"Chore {name} created successully.", "chore_id": chore_id }
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a chore")
 
 @router.post("/update_chore_priority")
 def update_chore_priority(new_priority: int, chore_id: int):
+    start_time = time.time()  # Start the timer
+
     if (new_priority != 1 and new_priority != 2 and new_priority != 3 
         and new_priority != 4 and new_priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
@@ -114,6 +124,10 @@ def update_chore_priority(new_priority: int, chore_id: int):
                 "chore_id": chore_id
             }).fetchone()
 
+            end_time = time.time()  # End the timer
+            execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+            print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+
         return {f"message: Chore priority updated successfully, Chore[chore_id: {chore_id}, name:{chore.name}, location_in_house:{chore.location_in_house}, frequency:{chore.frequency}, duration_mins:{chore.duration_mins}, priority:{chore.priority}, due_date:{chore.due_date}]" }
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -121,6 +135,7 @@ def update_chore_priority(new_priority: int, chore_id: int):
 
 @router.get("/")
 def get_chores(priority: Optional[int] = None):
+    start_time = time.time()  # Start the timer
     try:
         with db.engine.begin() as connection:
             if priority is not None:
@@ -152,8 +167,11 @@ def get_chores(priority: Optional[int] = None):
                 })
             print(chore)
             
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+        
         return chore_list
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while returning all chores (with specified priority)")
-

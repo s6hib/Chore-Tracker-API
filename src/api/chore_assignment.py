@@ -1,12 +1,12 @@
+from enum import Enum
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
-from src.api.roommate import Roommate
-from src.api.chore import Chore
 import datetime
 
 import sqlalchemy
 from src import database as db
+import time
 
 router = APIRouter(
     prefix="/chores",
@@ -14,16 +14,16 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-# class ChoreAssignment(BaseModel):
-#     chore_id: int
-#     roommate_id: int
-#     status: str = "pending"
+class ChoreStatusEnum(str, Enum):
+    pending = "pending"
+    in_progress = 'in_progress'
+    completed = 'completed'
 
-# class ChoreStatusUpdate(BaseModel):
-#     status: str
 
 @router.post("/{chore_id}/assignments")
 def assign_chore(chore_id: int, roommate_id: int):
+    start_time = time.time()
+
     with db.engine.begin() as connection:
         # Check if chore_id exists in the `chore` table
         chore_exists = connection.execute(sqlalchemy.text(
@@ -70,6 +70,9 @@ def assign_chore(chore_id: int, roommate_id: int):
             "roommate_id": roommate_id
         })
         
+    end_time = time.time()  # End the timer
+    execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
     return {
         "chore_id": chore_id,
         "roommate_id": roommate_id,
@@ -78,8 +81,9 @@ def assign_chore(chore_id: int, roommate_id: int):
 
 
 @router.patch("/{chore_id}/assignments/{roommate_id}/status")
-def update_chore_status(chore_id: int, roommate_id: int, status_update: str):
-    print(status_update)
+def update_chore_status(chore_id: int, roommate_id: int, status_update: ChoreStatusEnum):
+    start_time = time.time()
+
     if (status_update != "pending" and status_update != "in_progress" and status_update != "completed"):
         raise HTTPException(status_code=400, detail="Chore assignment status must be 'pending', 'in_progress', or 'completed'")
     
@@ -107,6 +111,9 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: str):
         }
         )
 
+    end_time = time.time()  # End the timer
+    execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
     return {
         "message": "Chore status updated successfully!", 
         "chore_id" : chore_id, 
@@ -118,6 +125,7 @@ def update_chore_status(chore_id: int, roommate_id: int, status_update: str):
 @router.get("/30_day_chore_history")
 def get_chore_history():
     # calculate date 30 days ago
+    start_time = time.time()
     thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
     
     try:
@@ -149,6 +157,10 @@ def get_chore_history():
                 "completion_date": record.completion_date  # removed strftime formatting to show full date
             })
         
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+
         return history_list
 
     except Exception as e:
@@ -156,67 +168,10 @@ def get_chore_history():
         raise HTTPException(status_code=500, detail="An error occurred while getting the chores completed in the last 30 days")
 
 
-@router.post("/assignments/weekly/{chore_id}/rotate")
-def rotate_chore(chore_id: int, roommate_id: int):
-    try:
-        with db.engine.begin() as connection:
-            # selects the id of all chores that have a frequency of 'weekly'
-            weekly_chores = connection.execute(sqlalchemy.text("""
-                SELECT id FROM chore WHERE frequency = :frequency
-            """), {"frequency": "weekly"}).all()
-
-            # if there are weekly chores get the id of the next largest roommate id
-            if weekly_chores:
-                next_result = connection.execute(sqlalchemy.text("""
-                    SELECT id
-                    FROM roommate
-                    WHERE id > :roommate_id
-                    ORDER BY id ASC
-                    LIMIT 1
-                """), {'roommate_id': roommate_id})
-                
-                next_roommate = next_result.fetchone()
-
-                # if there isn't a roommate with a larger id then circle back to the starting id and select that roommate id
-                if not next_roommate:
-                    next_roommate = connection.execute(sqlalchemy.text("""
-                        SELECT id
-                        FROM roommate
-                        ORDER BY id ASC
-                        LIMIT 1
-                    """)).fetchone()
-
-                new_roommate_id = next_roommate.id if next_roommate else roommate_id
-
-                # update the chore assignment to the 'next roommate' using the id from above
-                connection.execute(sqlalchemy.text("""
-                    UPDATE chore_assignment
-                    SET roommate_id = :new_roommate_id
-                    WHERE chore_id = :chore_id
-                """), {
-                    "chore_id": chore_id,
-                    "new_roommate_id": new_roommate_id
-                })
-
-                return {
-                    "message": "Chores Rotated Successfully", 
-                    "chore_id": chore_id, 
-                    "new_roommate_id": new_roommate_id,  
-                }
-
-        return {
-            "message": "No weekly chores found", 
-            "chore_id": chore_id, 
-            "new_roommate_id": roommate_id,  
-        }
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while rotating the chore responsibilites.")
-
-
-
 @router.post("/assignments/{chore_id}/rotate")
 def rotate_chore(chore_id: int, roommate_id: int):
+    start_time = time.time()
+
     with db.engine.begin() as connection:
     # get the id of the next largest roommate id
         current_chore_assignment = connection.execute(sqlalchemy.text("""
@@ -257,6 +212,10 @@ def rotate_chore(chore_id: int, roommate_id: int):
             "new_roommate_id": new_roommate_id
         })
 
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+        
         return {
             "message": "Chores Rotated Successfully", 
             "chore_id": chore_id, 
