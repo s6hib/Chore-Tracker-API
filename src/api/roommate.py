@@ -45,6 +45,23 @@ def get_roommates():
 def create_roommate(new_roommate: Roommate):
     try:
         with db.engine.begin() as connection:
+            # Check if roommate with same email already exists
+            existing_roommate = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT id FROM roommate 
+                    WHERE email = :email
+                    """
+                ),
+                {"email": new_roommate.email}
+            ).fetchone()
+            
+            if existing_roommate:
+                raise HTTPException(
+                    status_code=400,
+                    detail="A roommate with this email already exists"
+                )
+
             roommate_id = connection.execute(
                 sqlalchemy.text(
                     """
@@ -61,6 +78,8 @@ def create_roommate(new_roommate: Roommate):
             ).fetchone()
         return {"First Name": new_roommate.first_name, "Last Name": new_roommate.last_name, "Email": new_roommate.email, "roommate id": roommate_id.id}
 
+    except HTTPException as he:
+        raise he
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a new roommate.")
