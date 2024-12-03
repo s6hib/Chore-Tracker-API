@@ -28,6 +28,7 @@ def get_roommates():
                     """
                     SELECT r.first_name, r.last_name, r.email
                     FROM roommate r
+                    ORDER BY last_name
                     """
                 )
             ).fetchall()
