@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.api import auth
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 import datetime
 from enum import Enum
 import sqlalchemy
@@ -20,7 +20,7 @@ class Chore(BaseModel):
     location_in_house: str
     frequency: FrequencyEnum
     duration_mins: int
-    priority: int = Field(..., ge=1, le=5, description="Priority must be between 1 and 5")
+    priority: int
     due_date: datetime.date
 
 router = APIRouter(
@@ -31,7 +31,8 @@ router = APIRouter(
 
 @router.post("/")
 def create_chore(chore: Chore):
-    # Priority validation is now handled by Pydantic model
+    if (chore.priority != 1 and chore.priority != 2 and chore.priority != 3 and chore.priority != 4 and chore.priority != 5):
+        raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
     
     if (chore.due_date < datetime.date.today()):
         raise HTTPException(status_code=400, detail="Due date cannot be in the past")
@@ -52,7 +53,7 @@ def create_chore(chore: Chore):
                 "location_in_house": chore.location_in_house,
                 "frequency": chore.frequency.value,
                 "duration_mins": chore.duration_mins,
-                "priority": chore.priority,
+                "priority": chore.priority,  # from 1 to 5 only or it will cause an error
                 "due_date": chore.due_date
             })
         
@@ -65,7 +66,7 @@ def create_chore(chore: Chore):
 
 @router.post("/update_chore_priority")
 def update_chore_priority(new_priority: int, chore_id: int):
-    if not 1 <= new_priority <= 5:
+    if (new_priority != 1 and new_priority != 2 and new_priority != 3 and new_priority != 4 and new_priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
     
     try:
