@@ -198,7 +198,10 @@ def update_bill_list_status(
         raise HTTPException(status_code=400, detail="payment_update must be one of these: unpaid, paid, overdue")
 
     with db.engine.begin() as connection:     
-        # First check if bill exists
+        # Check both IDs first and collect any errors
+        validation_errors = []
+        
+        # Check if bill exists
         bill_exists = connection.execute(sqlalchemy.text(
             """
             SELECT 1 FROM bill 
@@ -209,9 +212,9 @@ def update_bill_list_status(
         }).first()
         
         if not bill_exists:
-            raise HTTPException(status_code=404, detail=f"Bill with ID {bill_id} not found")
+            validation_errors.append(f"Bill with ID {bill_id} not found")
 
-        # Then check if roommate exists
+        # Check if roommate exists
         roommate_exists = connection.execute(sqlalchemy.text(
             """
             SELECT 1 FROM roommate 
@@ -222,9 +225,13 @@ def update_bill_list_status(
         }).first()
         
         if not roommate_exists:
-            raise HTTPException(status_code=404, detail=f"Roommate with ID {roommate_id} not found")
+            validation_errors.append(f"Roommate with ID {roommate_id} not found")
 
-        # Finally check if the bill-roommate assignment exists
+        # If we have any validation errors, raise them now
+        if validation_errors:
+            raise HTTPException(status_code=404, detail=". ".join(validation_errors))
+
+        # Only check for assignment if both IDs exist
         assignment_exists = connection.execute(sqlalchemy.text(
             """
             SELECT 1 FROM bill_list 
