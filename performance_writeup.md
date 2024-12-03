@@ -37,17 +37,13 @@ This data model reflects the realistic scaling of a roommate tracking service an
    - Each chore is assigned to a specific roommate, maintaining a one-to-one relationship with the `chore` table.
 
 4. **Bills (41,000):**
-   - Bills are generated monthly or for specific shared expenses (e.g., utilities, rent, groceries). With **10 roommates** and **5 years** of tracking:
-     ```
-     12 bills/year * 5 years * 10 roommates = 600 bills
-     ```
+   - Bills are generated monthly or for specific shared expenses (e.g., utilities, rent, groceries). 
+
    - This model also assumes additional itemized expenses, such as shared meals or one-time purchases, leading to the 50,000 total.
 
 5. **Bill List (410,000):**
    - Each bill is shared among all 10 roommates, resulting in 10 entries per bill:
-     ```
-     50,000 bills * 10 roommates = 500,000 rows
-     ```
+
 ---
 
 ### **Service Scalability**
