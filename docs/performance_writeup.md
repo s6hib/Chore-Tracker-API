@@ -73,12 +73,21 @@ Seq Scan on chore  (cost=0.00..11740.00 rows=100617 width=41)
   get chores 1725.57 ms
 get chores = 7544.33 ms 
 
-2. get_roommates = 764.80 ms
+2. get_roommates = 764.80 ms 
+  get_roommates 32.93 ms (order by last name)
+Sort  (cost=42.42..43.87 rows=580 width=96)
+  Sort Key: last_name
+  ->  Seq Scan on roommate r  (cost=0.00..15.80 rows=580 width=96)
+
+
 
 
 get 30 day chore history = 144.72 ms b/c chore due dates are set in the future
 
 
-3. get bill =  838.24 ms
+3. get bill =  334.77ms ms
 
-get bill assignments = 87.79 ms
+
+get bill assignments = 89.35 ms
+
+4. post rotate 

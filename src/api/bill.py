@@ -143,7 +143,7 @@ def get_bills():
                 "bill_type": bill.bill_type,
                 "message": bill.message
                 })
-            print(bill)
+           
         
         end_time = time.time()  # End the timer
         execution_time = (end_time - start_time) * 1000  # Time in milliseconds
