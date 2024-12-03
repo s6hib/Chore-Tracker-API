@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
-from src.api.roommate import Roommate
-from src.api.chore import Chore
 import datetime
 
 import sqlalchemy

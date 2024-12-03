@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.api import auth
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import datetime
 from enum import Enum
 import sqlalchemy
@@ -20,7 +20,7 @@ class Chore(BaseModel):
     location_in_house: str
     frequency: FrequencyEnum
     duration_mins: int
-    priority: int
+    priority: int = Field(..., ge=1, le=5, description="Priority must be between 1 and 5")
     due_date: datetime.date
 
 router = APIRouter(
@@ -31,9 +31,7 @@ router = APIRouter(
 
 @router.post("/")
 def create_chore(chore: Chore):
-    if (chore.priority != 1 and chore.priority != 2 and chore.priority != 3 
-        and chore.priority != 4 and chore.priority != 5):
-        raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
+    # Priority validation is now handled by Pydantic model
     
     if (chore.due_date < datetime.date.today()):
         raise HTTPException(status_code=400, detail="Due date cannot be in the past")
@@ -54,7 +52,7 @@ def create_chore(chore: Chore):
                 "location_in_house": chore.location_in_house,
                 "frequency": chore.frequency.value,
                 "duration_mins": chore.duration_mins,
-                "priority": chore.priority, # from 1 to 5 only or it will cause an error
+                "priority": chore.priority,
                 "due_date": chore.due_date
             })
         
@@ -67,8 +65,7 @@ def create_chore(chore: Chore):
 
 @router.post("/update_chore_priority")
 def update_chore_priority(new_priority: int, chore_id: int):
-    if (new_priority != 1 and new_priority != 2 and new_priority != 3 
-        and new_priority != 4 and new_priority != 5):
+    if not 1 <= new_priority <= 5:
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
     
     try:
@@ -124,6 +121,8 @@ def get_chores(priority: Optional[int] = None):
     try:
         with db.engine.begin() as connection:
             if priority is not None:
+                if not 1 <= priority <= 5:
+                    raise HTTPException(status_code=400, detail="Priority filter must be between 1 and 5")
                 result = connection.execute(sqlalchemy.text(
                     '''
                     SELECT name, location_in_house, frequency, duration_mins, priority, due_date
@@ -156,4 +155,3 @@ def get_chores(priority: Optional[int] = None):
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while returning all chores (with specified priority)")
-
