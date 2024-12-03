@@ -144,6 +144,7 @@ def get_chores(priority: Optional[int] = None):
                     SELECT name, location_in_house, frequency, duration_mins, priority, due_date
                     FROM chore
                     WHERE priority = :priority
+                    ORDER BY priority
                     '''
                 ), {"priority": priority}).fetchall()
             else:
@@ -151,6 +152,7 @@ def get_chores(priority: Optional[int] = None):
                     '''
                     SELECT name, location_in_house, frequency, duration_mins, priority, due_date
                     FROM chore
+                    ORDER BY priority
                     '''
                 )).fetchall()
         
@@ -170,7 +172,7 @@ def get_chores(priority: Optional[int] = None):
         end_time = time.time()  # End the timer
         execution_time = (end_time - start_time) * 1000  # Time in milliseconds
         print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
-        
+
         return chore_list
     except Exception as e:
         print(f"An error occurred: {e}")
