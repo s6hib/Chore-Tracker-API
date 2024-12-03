@@ -62,32 +62,41 @@ This service is designed to scale effectively because:
 
 ---
 
-1. get_chores 8367.33 ms (without priorty)
-get_chores = 1791.10 ms
+1. get_chores end points give 8367.33 ms without any priority. 
+get_chores gives 1791.10 ms with the priority chosen.
+This is the scan before creating the index.  
 Seq Scan on chore  (cost=0.00..10490.00 rows=500000 width=57)
 Index Scan using chore_pkey on chore  (cost=0.42..8.44 rows=1 width=57)
-Index Scan using idx_chore_id on chore  (cost=0.42..8.44 rows=1 width=57)
 
+This is the scan after creating the index.
+Index Scan using idx_chore_id on chore  (cost=0.42..8.44 rows=1 width=57)
 Seq Scan on chore  (cost=0.00..11740.00 rows=100617 width=41)
   ->  Bitmap Index Scan on idx_priority  (cost=0.00..1099.05 rows=100617 width=0)
-  get chores 1725.57 ms
+
+This is get chores 1725.57 ms
 get chores = 7544.33 ms 
 
-2. get_roommates = 764.80 ms 
-  get_roommates 32.93 ms (order by last name)
-Sort  (cost=42.42..43.87 rows=580 width=96)
-  Sort Key: last_name
-  ->  Seq Scan on roommate r  (cost=0.00..15.80 rows=580 width=96)
+2. get 30 day chore history = 144.72 ms b/c chore due dates are set in the future
+Sort  (cost=0.01..0.02 rows=0 width=84)
+  Sort Key: c.due_date DESC
+    ->  Result  (cost=0.00..0.00 rows=0 width=84)
+            One-Time Filter: false
 
-
-
-
-get 30 day chore history = 144.72 ms b/c chore due dates are set in the future
-
+get 30 day chore history = 41.90 ms
+Sort  (cost=0.01..0.02 rows=0 width=84)
+  Sort Key: c.due_date DESC
+  ->  Result  (cost=0.00..0.00 rows=0 width=84)
+        One-Time Filter: false
 
 3. get bill =  334.77ms ms
+Sort  (cost=3955.28..4057.78 rows=41000 width=39)
+  Sort Key: due_date
+    ->  Seq Scan on bill  (cost=0.00..814.00 rows=41000 width=39)
 
 
-get bill assignments = 89.35 ms
+after adding index:
+Index Scan using idx_duedate on bill  (cost=0.29..2383.03 rows=41000 width=39)
+get_bill = 305.88 ms
 
-4. post rotate 
+
+ 
