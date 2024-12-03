@@ -143,10 +143,12 @@ def get_chore_history():
                 JOIN roommate r ON ca.roommate_id = r.id
                 WHERE ca.status = 'completed'
                 AND c.due_date >= :thirty_days_ago
+                AND c.due_date <= :today
                 ORDER BY c.due_date DESC
                 '''
             ), {
-                "thirty_days_ago": thirty_days_ago
+                "thirty_days_ago": thirty_days_ago,
+                "today": datetime.date.today()
             }).fetchall()
         
         history_list = []

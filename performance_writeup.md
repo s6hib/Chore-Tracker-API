@@ -59,3 +59,23 @@ This service is designed to scale effectively because:
 
 3. **Balanced Distribution:**
    - Chores and bills are distributed across all roommates, ensuring a realistic workload and financial split.
+
+---
+
+1. get_chores 8367.33 ms
+Seq Scan on chore  (cost=0.00..10490.00 rows=500000 width=57)
+Index Scan using chore_pkey on chore  (cost=0.42..8.44 rows=1 width=57)
+Index Scan using idx_chore_id on chore  (cost=0.42..8.44 rows=1 width=57)
+
+Seq Scan on chore  (cost=0.00..11740.00 rows=100617 width=41)
+  ->  Bitmap Index Scan on idx_priority  (cost=0.00..1099.05 rows=100617 width=0)
+  
+2. get_roommates = 764.80 ms
+
+
+get 30 day chore history = 144.72 ms b/c chore due dates are set in the future
+
+
+3. get bill = 674.39 ms
+
+get bill assignments = 87.79 ms
