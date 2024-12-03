@@ -64,8 +64,8 @@ create table
     roommate_id bigint null,
     status public.status_enum null,
     constraint chore_assignment_pkey primary key (id),
-    constraint chore_assignment_chore_id_fkey foreign key (chore_id) references chore (id) ON DELETE CASCADE,
-    constraint chore_assignment_roommate_id_fkey foreign key (roommate_id) references roommate (id) ON DELETE CASCADE
+    constraint chore_assignment_chore_id_fkey foreign key (chore_id) references chore (id) ON DELETE SET NULL,
+    constraint chore_assignment_roommate_id_fkey foreign key (roommate_id) references roommate (id) ON DELETE SET NULL
   ) tablespace pg_default;
 
 CREATE TYPE bill_type_enum AS ENUM ('electricity', 'water', 'internet', 'rent','gas','trash','groceries');
@@ -100,6 +100,6 @@ create table
     status public.payment_status_enum null,
     amount real not null default '0'::real,
     constraint bill_list_pkey primary key (id),
-    constraint bill_list_bill_id_fkey foreign key (bill_id) references bill (id) ON DELETE CASCADE,
-    constraint roommate_id_fkey foreign key (roommate_id) references roommate (id) ON DELETE CASCADE
+    constraint bill_list_bill_id_fkey foreign key (bill_id) references bill (id) ON DELETE SET NULL,
+    constraint roommate_id_fkey foreign key (roommate_id) references roommate (id) ON DELETE SET NULL
   ) tablespace pg_default;
