@@ -40,7 +40,7 @@ Schema/API design
 3. Added constraints for enum fields
 4. Changed ON DELETE CASCADE to ON DELETE SET NULL in order to avoid orphaned data
 5. added more descriptive column names
-6. Not applicable at this time
+6. Added indexes after testing runtime
 7. Made the primary key consistent amongst all tables
 8. Implemented RESTful naming conventions previously
 9. In some fields having the default value as NULL is fine when they are unique for every person
