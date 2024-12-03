@@ -8,6 +8,7 @@ from src import database as db
 from typing import Optional
 
 import math
+import time
 
 router = APIRouter(
     prefix="/bills",
@@ -41,6 +42,8 @@ def create_bill(cost: float = 0.50, #= Path(..., gt=0, description="Bill cost mu
                 due_date: datetime.date = datetime.date.today(), 
                 bill_type: BillTypeEnum = '', 
                 message: Optional[str] = ''):
+    
+    start_time = time.time()
 
     if (bill_type != "electricity" and bill_type != "water" and bill_type != "internet"
         and bill_type != "rent" and bill_type != "gas" and bill_type != "trash" and bill_type != "groceries"):
@@ -104,6 +107,10 @@ def create_bill(cost: float = 0.50, #= Path(..., gt=0, description="Bill cost mu
                 })
 
         print(f"cost per roommate {cost_per_roommate}")
+
+    end_time = time.time()  # End the timer
+    execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
             
     return {
         "status": "success",
@@ -113,6 +120,7 @@ def create_bill(cost: float = 0.50, #= Path(..., gt=0, description="Bill cost mu
 
 @router.get("/")
 def get_bills():
+    start_time = time.time()
     try:
         with db.engine.begin() as connection:
             result = connection.execute(sqlalchemy.text(
@@ -136,6 +144,10 @@ def get_bills():
                 "message": bill.message
                 })
             print(bill)
+        
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
 
         return {
             "status": "success",
@@ -149,6 +161,8 @@ def get_bills():
 @router.get("/{bill_id}/assignments")
 def get_bill_assignments(
     bill_id: int = Path(..., gt=0, description="The ID of the bill to get assignments for")):
+
+    start_time = time.time()
 
     with db.engine.begin() as connection:
         # Query all assignments for the specified bill_id
@@ -176,6 +190,10 @@ def get_bill_assignments(
         })
 
     print(bill_assignments)
+
+    end_time = time.time()  # End the timer
+    execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
     
     return {
         "status": "success",
@@ -195,6 +213,9 @@ def update_bill_list_status(
     roommate_id: int = Path(..., gt=0, description="The ID of the roommate to update"),
     payment_update: StatusEnum = ''
 ):
+    
+    start_time = time.time()
+
     if (payment_update != "paid" and payment_update != "unpaid" and payment_update != "overdue"):
         raise HTTPException(status_code=400, detail="payment_update must be one of these: unpaid, paid, overdue")
 
@@ -259,6 +280,10 @@ def update_bill_list_status(
             "status" : payment_update
         })
 
+    end_time = time.time()  # End the timer
+    execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+
     return {
         "status": "success",
         "data": None,
@@ -289,7 +314,8 @@ def update_bill(
     bill_type: BillTypeEnum = '',
     message: str = ''
 ):
-    
+    start_time = time.time()
+
     if (bill_type != "electricity" and bill_type != "water" and bill_type != "internet"
         and bill_type != "rent" and bill_type != "gas" and bill_type != "trash" and bill_type != "groceries"):
         raise HTTPException(status_code=400, detail="Bill_type must be one of these: electricity, water, internet, rent, gas, trash, or groceries")
@@ -337,6 +363,10 @@ def update_bill(
             if result.rowcount == 0:
                 raise HTTPException(status_code=404, detail="No bill found with the specified ID")
 
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+        
         return {
             "status": "success",
             "data": None,

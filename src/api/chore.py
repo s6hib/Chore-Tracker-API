@@ -6,6 +6,7 @@ from enum import Enum
 import sqlalchemy
 from src import database as db
 from typing import Optional
+import time
 
 class FrequencyEnum(str, Enum):
     daily = 'daily'
@@ -31,6 +32,9 @@ router = APIRouter(
 
 @router.post("/")
 def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, duration_mins: int, priority: int, due_date: datetime.date = datetime.date.today()):
+    start_time = time.time()  # Start the timer
+
+    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
     if (priority != 1 and priority != 2 and priority != 3 
         and priority != 4 and priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
@@ -59,7 +63,11 @@ def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, du
             })
         
         chore_id = result.scalar_one()
-        
+
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+            
         return {"message": f"Chore {name} created successully.", "chore_id": chore_id }
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -67,6 +75,8 @@ def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, du
 
 @router.post("/update_chore_priority")
 def update_chore_priority(new_priority: int, chore_id: int):
+    start_time = time.time()  # Start the timer
+
     if (new_priority != 1 and new_priority != 2 and new_priority != 3 
         and new_priority != 4 and new_priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
@@ -114,6 +124,10 @@ def update_chore_priority(new_priority: int, chore_id: int):
                 "chore_id": chore_id
             }).fetchone()
 
+            end_time = time.time()  # End the timer
+            execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+            print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+
         return {f"message: Chore priority updated successfully, Chore[chore_id: {chore_id}, name:{chore.name}, location_in_house:{chore.location_in_house}, frequency:{chore.frequency}, duration_mins:{chore.duration_mins}, priority:{chore.priority}, due_date:{chore.due_date}]" }
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -121,6 +135,7 @@ def update_chore_priority(new_priority: int, chore_id: int):
 
 @router.get("/")
 def get_chores(priority: Optional[int] = None):
+    start_time = time.time()  # Start the timer
     try:
         with db.engine.begin() as connection:
             if priority is not None:
@@ -152,6 +167,10 @@ def get_chores(priority: Optional[int] = None):
                 })
             print(chore)
             
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+        
         return chore_list
     except Exception as e:
         print(f"An error occurred: {e}")
