@@ -66,6 +66,12 @@ def create_bill(bill_to_assign: Bill):
             num_roommates = len(roommates)
             if num_roommates == 0:
                 raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
+            
+            if bill_to_assign <= 0:
+                raise HTTPException(status_code=400, detail="Bill cost must be greater than zero.")
+            # Distribute the bill amount such that rounding errors are adjusted.
+            # Some roommates may pay a slightly higher or lower amount to ensure the total is correct.
+            
             cost_per_roommate = bill_to_assign.cost / num_roommates
 
             cost_per_roommate_rounded_down = math.floor(cost_per_roommate * 100) / 100
@@ -103,7 +109,7 @@ def create_bill(bill_to_assign: Bill):
     
     except Exception as e:
         print(f"An error occurred: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while creating a new bill")
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 @router.get("/")
 def get_bills():
@@ -134,7 +140,7 @@ def get_bills():
         return {
             "status": "success",
             "data": bill_list,
-            "message": None
+            "message": "Get all the bills in the database!"
         }
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -174,7 +180,7 @@ def get_bill_assignments(
     return {
         "status": "success",
         "data": {"bill_id": bill_id, "assignments": bill_assignments},
-        "message": None
+        "message": f"Get all the bill assignments of bill id: {bill_id}"
     }
 
 class StatusEnum(str, Enum):
