@@ -125,7 +125,8 @@ def get_bills():
         with db.engine.begin() as connection:
             result = connection.execute(sqlalchemy.text(
                 '''SELECT id AS bill_id, cost AS total_cost, due_date, bill_type, message
-                FROM bill''')).fetchall() 
+                FROM bill
+                ORDER BY due_date''')).fetchall() 
 
         if not result:
             return {
@@ -366,7 +367,7 @@ def update_bill(
         end_time = time.time()  # End the timer
         execution_time = (end_time - start_time) * 1000  # Time in milliseconds
         print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
-        
+
         return {
             "status": "success",
             "data": None,
