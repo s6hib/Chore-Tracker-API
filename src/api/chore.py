@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.api import auth
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import datetime
 from enum import Enum
 import sqlalchemy
@@ -27,7 +27,7 @@ class Chore(BaseModel):
     location_in_house: str
     frequency: FrequencyEnum
     duration_mins: int
-    priority: int
+    priority: int = Field(..., ge=1, le=5, description="Priority must be between 1 and 5")
     due_date: datetime.date
 
 router = APIRouter(
@@ -163,4 +163,3 @@ def get_chores(priority: Optional[priorityEnum] = None):
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while returning all chores (with specified priority)")
-

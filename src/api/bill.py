@@ -5,7 +5,6 @@ import datetime
 from enum import Enum
 import sqlalchemy
 from src import database as db
-from src.api.roommate import Roommate
 from typing import Optional
 
 import math
