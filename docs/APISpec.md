@@ -4,7 +4,7 @@
 
 **Endpoint:** `POST /create_chore`
 
-**Description:** Creates a new chore and assigns it to a roommate with priority, location, frequency, duration(mins) and due date.
+**Description:** Creates a new chore with priority, location, frequency, duration (mins) and due date.
 
 **Request Body:**
 
