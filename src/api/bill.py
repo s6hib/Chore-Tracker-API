@@ -66,22 +66,23 @@ def create_bill(cost: float = 0.50, #= Path(..., gt=0, description="Bill cost mu
         )
         bill_id = add_bill_query.scalar_one()
 
-        roommates = connection.execute(sqlalchemy.text(
+        # Get all roommates and check if any exist
+        roommates_result = connection.execute(sqlalchemy.text(
             """
             SELECT id FROM roommate
             """
-        )).fetchall()
-
-        num_roommates = len(roommates)
-        if num_roommates == 0:
+        ))
+        
+        if roommates_result.rowcount == 0:
             raise HTTPException(status_code=400, detail="No roommates found to assign the bill.")
-        cost_per_roommate = cost / num_roommates
+
+        # Fetch all roommates for processing
+        roommates = roommates_result.fetchall()
+        cost_per_roommate = cost / roommates_result.rowcount
 
         cost_per_roommate_rounded_down = math.floor(cost_per_roommate * 100) / 100
-
         cost_per_roommate_rounded_up = math.ceil(cost_per_roommate * 100) / 100
-
-        cents_over_cost = round((cost_per_roommate_rounded_up * num_roommates - cost) * 100)
+        cents_over_cost = round((cost_per_roommate_rounded_up * roommates_result.rowcount - cost) * 100)
 
         print(f"cents over cost {cents_over_cost}")
 
