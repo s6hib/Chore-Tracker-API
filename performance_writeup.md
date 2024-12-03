@@ -3,7 +3,7 @@
 ## **Fake Data Modeling**
 
 ### **Python Script**
-The Python script used to generate the fake data for the service is available here: [fake_data_generation.py](link-to-your-script).
+The Python script used to generate the fake data for the service is available here: [fake_data.py](https://github.com/s6hib/Chore-Tracker-API/blob/main/fake_data.py).
 
 ### **Final Rows Numbers in Each Table**
 The service generates the following number of rows for each table:
