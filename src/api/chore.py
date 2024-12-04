@@ -32,9 +32,9 @@ router = APIRouter(
 
 @router.post("/")
 def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, duration_mins: int, priority: int, due_date: datetime.date = datetime.date.today()):
-    start_time = time.time()  # Start the timer
+    # start_time = time.time()  # Start the timer
 
-    print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+    # print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
     if (priority != 1 and priority != 2 and priority != 3 
         and priority != 4 and priority != 5):
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
@@ -64,9 +64,9 @@ def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, du
         
         chore_id = result.scalar_one()
 
-        end_time = time.time()  # End the timer
-        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
-        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+        # end_time = time.time()  # End the timer
+        # execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        # print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
             
         return {"message": f"Chore {name} created successully.", "chore_id": chore_id }
     except Exception as e:
