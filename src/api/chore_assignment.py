@@ -225,7 +225,7 @@ def rotate_chore(chore_id: int, roommate_id: int):
             "new_roommate_id": new_roommate_id,  
         }
 
-@router.get("/assignments")
+@router.get("/{chore_id}/assignments/{roommate_id}")
 def get_chore_assignment(roommate_id: Optional[int] = None):
     start_time = time.time()  # Start the timer
     try:
