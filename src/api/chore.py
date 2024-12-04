@@ -141,7 +141,7 @@ def get_chores(priority: Optional[int] = None):
             if priority is not None:
                 result = connection.execute(sqlalchemy.text(
                     '''
-                    SELECT name, location_in_house, frequency, duration_mins, priority, due_date
+                    SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
                     FROM chore
                     WHERE priority = :priority
                     ORDER BY priority
@@ -150,7 +150,7 @@ def get_chores(priority: Optional[int] = None):
             else:
                 result = connection.execute(sqlalchemy.text(
                     '''
-                    SELECT name, location_in_house, frequency, duration_mins, priority, due_date
+                    SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
                     FROM chore
                     ORDER BY priority
                     '''
@@ -160,6 +160,7 @@ def get_chores(priority: Optional[int] = None):
                 
         for chore in result:
             chore_list.append({
+                "chore_id": chore.id,
                 "name": chore.name,
                 "location_in_house": chore.location_in_house,
                 "frequency": chore.frequency,
