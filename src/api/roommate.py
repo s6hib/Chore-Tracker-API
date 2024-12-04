@@ -88,7 +88,7 @@ def create_roommate(new_roommate: Roommate):
         end_time = time.time()  # End the timer
         execution_time = (end_time - start_time) * 1000  # Time in milliseconds
         print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
-        return {"First Name": new_roommate.first_name, "Last Name": new_roommate.last_name, "Email": new_roommate.email, "roommate id": roommate_id.id}
+        return "Roommate successfully created", {"First Name": new_roommate.first_name, "Last Name": new_roommate.last_name, "Email": new_roommate.email, "roommate id": roommate_id.id}
 
     except HTTPException as he:
         raise he
