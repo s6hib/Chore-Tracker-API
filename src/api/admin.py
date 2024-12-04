@@ -20,17 +20,17 @@ def reset():
             # first delete all chore assignments (due to foreign key constraint)
             connection.execute(sqlalchemy.text(
                 """
-                DELETE FROM chore_assignment;
-                DELETE FROM roommate;
-                DELETE FROM bill;
-                DELETE FROM bill_list;
+                TRUNCATE TABLE chore_assignment;
+                TRUNCATE TABLE roommate;
+                TRUNCATE TABLE bill;
+                TRUNCATE TABLE bill_list;
                 """
             ))
             
             # then delete all chores
             connection.execute(sqlalchemy.text(
                 """
-                DELETE FROM chore;
+                TRUNCATE TABLE chore;
                 """
             ))
             

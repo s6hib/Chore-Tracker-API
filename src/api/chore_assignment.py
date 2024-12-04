@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
@@ -223,3 +224,45 @@ def rotate_chore(chore_id: int, roommate_id: int):
             "chore_id": chore_id, 
             "new_roommate_id": new_roommate_id,  
         }
+
+@router.get("/assignments")
+def get_chore_assignment(roommate_id: Optional[int] = None):
+    start_time = time.time()  # Start the timer
+    try:
+        with db.engine.begin() as connection:
+            if roommate_id is not None:
+                result = connection.execute(sqlalchemy.text(
+                    '''
+                    SELECT chore_id, roommate_id, status
+                    FROM chore_assignment
+                    WHERE roommate_id = :roommate_id
+                    ORDER BY roommate_id
+                    '''
+                ), {"roommate_id": roommate_id}).fetchall()
+            else:
+                result = connection.execute(sqlalchemy.text(
+                    '''
+                    SELECT chore_id, roommate_id, status
+                    FROM chore_assignment
+                    ORDER BY roommate_id
+                    '''
+                )).fetchall()
+        
+        chore_list = []
+                
+        for chore in result:
+            chore_list.append({
+                "chore_id": chore.chore_id,
+                "roommate_id": chore.roommate_id,
+                "status": chore.status
+                })
+            print(chore)
+            
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+
+        return chore_list
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while returning all chores assignments (with specified roommate_id)")
