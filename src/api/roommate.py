@@ -123,12 +123,16 @@ def remove_roommate(roommate_id: int):
         execution_time = (end_time - start_time) * 1000  # Time in milliseconds
         print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
         
-        return "Roommate successfully deleted", {
-            "roommate_id": roommate_removed.id,
-            "First Name": roommate_removed.first_name,
-            "Last Name": roommate_removed.last_name,
-            "Email": roommate_removed.email
-        }
+        return {
+            "message": "Roommate successfully deleted",
+            "data": {
+                "roommate_id": roommate_removed.id,
+                "first_name": roommate_removed.first_name,
+                "last_name": roommate_removed.last_name,
+                "email": roommate_removed.email
+            }
+        }, 200
+
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while removing a roommate.")
