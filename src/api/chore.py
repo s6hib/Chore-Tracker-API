@@ -135,7 +135,7 @@ def update_chore_priority(new_priority: int, chore_id: int):
 
 @router.get("/")
 def get_chores(priority: Optional[int] = None):
-    start_time = time.time()  # Start the timer
+    #start_time = time.time()  # Start the timer
     try:
         with db.engine.begin() as connection:
             if priority is not None:
@@ -170,9 +170,9 @@ def get_chores(priority: Optional[int] = None):
                 })
             print(chore)
             
-        end_time = time.time()  # End the timer
-        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
-        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+        #end_time = time.time()  # End the timer
+        #execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        #print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
 
         return chore_list
     except Exception as e:
