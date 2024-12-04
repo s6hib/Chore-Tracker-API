@@ -26,7 +26,7 @@ def get_roommates():
             result = connection.execute(
                 sqlalchemy.text(
                     """
-                    SELECT r.first_name, r.last_name, r.email
+                    SELECT r.first_name, r.last_name, r.email, r.id
                     FROM roommate r
                     ORDER BY last_name
                     """
@@ -37,7 +37,8 @@ def get_roommates():
             roommate_list.append({
                 "first_name": roommate.first_name,
                 "last_name": roommate.last_name,
-                "email": roommate.email
+                "email": roommate.email,
+                "roommate_id": roommate.id
             })
         
         end_time = time.time()  # End the timer
