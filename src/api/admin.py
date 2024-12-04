@@ -23,6 +23,9 @@ def reset():
             connection.execute(sqlalchemy.text(
                 """
                 DELETE FROM chore_assignment;
+                DELETE FROM roommate;
+                DELETE FROM bill;
+                DELETE FROM bill_list;
                 """
             ))
             
