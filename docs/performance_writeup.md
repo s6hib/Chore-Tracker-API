@@ -68,7 +68,9 @@ This is the scan before creating the index.
 Seq Scan on chore  (cost=0.00..10490.00 rows=500000 width=57)
 Index Scan using chore_pkey on chore  (cost=0.42..8.44 rows=1 width=57)
 
-This is the scan after creating the index.
+This EXPLAIN means that the cost range of the query is 0.00 to 11740.00, which is rather expensive, and the number of rows that are returned is 50 thousand.
+
+This is the scan after creating the index on the priority column.
 Index Scan using idx_chore_id on chore  (cost=0.42..8.44 rows=1 width=57)
 Seq Scan on chore  (cost=0.00..11740.00 rows=100617 width=41)
   ->  Bitmap Index Scan on idx_priority  (cost=0.00..1099.05 rows=100617 width=0)
@@ -76,11 +78,15 @@ Seq Scan on chore  (cost=0.00..11740.00 rows=100617 width=41)
 This is get chores 1725.57 ms
 get chores = 7544.33 ms 
 
+The get_chores query was really slow at first because it scanned the whole table to get results. Adding an index on the priority column helped a lot by speeding things up with a better scan method. Then, adding a composite index on priority and due_date made it even faster by letting the database filter and sort much more efficiently. These changes cut the time from 8367.33 to 7544.33 ms for the query without any filters on the priority and from 1791.10 to 1725.57 ms for the query with the filter of priority 1.
+
 2. get 30 day chore history = 144.72 ms b/c chore due dates are set in the future
 Sort  (cost=0.01..0.02 rows=0 width=84)
   Sort Key: c.due_date DESC
     ->  Result  (cost=0.00..0.00 rows=0 width=84)
             One-Time Filter: false
+
+This EXPLAIN means that the cost range of the query is 0.01 to 0.02, which is very inexpensive, and the number of rows that are returned is 0 because there aren't any chores that have been completed in the last 30 days because in our fake data we made all chores due in the future.
 
 get 30 day chore history = 41.90 ms
 Sort  (cost=0.01..0.02 rows=0 width=84)
@@ -88,15 +94,20 @@ Sort  (cost=0.01..0.02 rows=0 width=84)
   ->  Result  (cost=0.00..0.00 rows=0 width=84)
         One-Time Filter: false
 
+The get_30_day_chore_history query was slow because it had to sort the table by due_date without any index, so it had to check every row. Adding an index on due_date fixed that by letting the database sort and filter directly, which brought the time down from 144.72 ms to 41.90 ms.
+
 3. get bill =  334.77ms ms
 Sort  (cost=3955.28..4057.78 rows=41000 width=39)
   Sort Key: due_date
     ->  Seq Scan on bill  (cost=0.00..814.00 rows=41000 width=39)
 
+This EXPLAIN means that the cost range of the query is 3955.28 to 4057.78, which is moderately expensive, and the number of rows that are returned is 41000 which is the total number of fake bills created.
 
 after adding index:
 Index Scan using idx_duedate on bill  (cost=0.29..2383.03 rows=41000 width=39)
 get_bill = 305.88 ms
+
+The get_bill query also had issues because it was sorting by due_date without an index, which meant another full table scan. Adding an index on due_date made the query faster by letting the database skip the full scan, reducing the time from 334.77 ms to 305.88 ms. The improvement wasn’t huge, but it still helped make things run smoother.
 
 
  
