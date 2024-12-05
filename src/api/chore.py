@@ -32,7 +32,7 @@ router = APIRouter(
 
 @router.post("/")
 def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, duration_mins: int, priority: int, due_date: datetime.date = datetime.date.today()):
-    # start_time = time.time()  # Start the timer
+    start_time = time.time()  # Start the timer
 
     # print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
     if (priority != 1 and priority != 2 and priority != 3 
@@ -63,79 +63,87 @@ def create_chore(name: str, location_in_house: str, frequency: FrequencyEnum, du
             })
         
         chore_id = result.scalar_one()
-
-        # end_time = time.time()  # End the timer
-        # execution_time = (end_time - start_time) * 1000  # Time in milliseconds
-        # print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
-            
+         # Log execution time in all cases
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
+    
         return {"message": f"Chore {name} created successully.", "chore_id": chore_id }
+        
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while creating a chore")
-
+       
 @router.post("/update_chore_priority")
 def update_chore_priority(new_priority: int, chore_id: int):
     start_time = time.time()  # Start the timer
 
-    if (new_priority != 1 and new_priority != 2 and new_priority != 3 
-        and new_priority != 4 and new_priority != 5):
+    if new_priority not in [1, 2, 3, 4, 5]:  # Cleaner check for valid priorities
         raise HTTPException(status_code=400, detail="Priority must be an integer between 1 and 5 inclusive")
-    
-    try:
-        with db.engine.begin() as connection:
 
+    try:
+        # Check if chore ID exists
+        with db.engine.begin() as connection:
             chore_id_exists = connection.execute(sqlalchemy.text(
                 """
                 SELECT id
                 FROM chore
                 WHERE id = :chore_id;
-                """),
-                {
-                    "chore_id": chore_id
-                }).fetchall()
+                """
+            ), {"chore_id": chore_id}).fetchall()
+        
         if not chore_id_exists:
-            raise Exception
-            
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Chore_id does not exist")
-    
-    print("go here")
-            
-    try:
+            raise HTTPException(status_code=400, detail="Chore_id does not exist")
+
+        # Update the chore priority
         with db.engine.begin() as connection:
-            
             connection.execute(sqlalchemy.text(
                 """
                 UPDATE chore 
                 SET priority = :new_priority
                 WHERE id = :chore_id;
                 """
-            ),{
+            ), {
                 "new_priority": new_priority,
                 "chore_id": chore_id
             })
+
+            # Retrieve the updated chore for confirmation
             chore = connection.execute(sqlalchemy.text(
                 """
                 SELECT name, location_in_house, frequency, duration_mins, priority, due_date
                 FROM chore
                 WHERE id = :chore_id;
                 """
-            ),{
-                "chore_id": chore_id
-            }).fetchone()
+            ), {"chore_id": chore_id}).fetchone()
 
-            end_time = time.time()  # End the timer
-            execution_time = (end_time - start_time) * 1000  # Time in milliseconds
-            print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
-
-        return {f"message: Chore priority updated successfully, Chore[chore_id: {chore_id}, name:{chore.name}, location_in_house:{chore.location_in_house}, frequency:{chore.frequency}, duration_mins:{chore.duration_mins}, priority:{chore.priority}, due_date:{chore.due_date}]" }
+        # Success response
+        return {
+            "message": "Chore priority updated successfully",
+            "data": {
+                "chore_id": chore_id,
+                "name": chore.name,
+                "location_in_house": chore.location_in_house,
+                "frequency": chore.frequency,
+                "duration_mins": chore.duration_mins,
+                "priority": chore.priority,
+                "due_date": chore.due_date,
+            },
+        }
+    except HTTPException as e:
+        raise e
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while updating the chore priority")
+    finally:
+        # Log execution time in all cases
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
 
 @router.get("/")
 def get_chores(priority: Optional[int] = None):
-    #start_time = time.time()  # Start the timer
+    start_time = time.time()  # Start the timer
     try:
         with db.engine.begin() as connection:
             if priority is not None:
@@ -170,11 +178,12 @@ def get_chores(priority: Optional[int] = None):
                 })
             print(chore)
             
-        #end_time = time.time()  # End the timer
-        #execution_time = (end_time - start_time) * 1000  # Time in milliseconds
-        #print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
-
         return chore_list
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while returning all chores (with specified priority)")
+    finally:
+        # End the timer and log the execution time in all cases
+        end_time = time.time()  # End the timer
+        execution_time = (end_time - start_time) * 1000  # Time in milliseconds
+        print(f" Endpoint Name Execution Time: {execution_time:.2f} ms")
