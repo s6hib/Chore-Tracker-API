@@ -125,7 +125,6 @@ SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
 FROM chore
 ORDER BY priority;
 ```
-### Output:
 ### Observations:
 Execution Time: The query execution time in the database reduced to 171.010 ms, an improvement from the initial 249.034 ms.
 Buffer Usage: Data was retrieved efficiently from shared memory buffers (shared hit=19791), minimizing disk I/O.
