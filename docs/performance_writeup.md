@@ -62,23 +62,96 @@ This service is designed to scale effectively because:
 
 ---
 
-1. get_chores end points give 8367.33 ms without any priority. 
-get_chores gives 1791.10 ms with the priority chosen. 
-This is the scan before creating the index.  
-Seq Scan on chore  (cost=0.00..10490.00 rows=500000 width=57)
-Index Scan using chore_pkey on chore  (cost=0.42..8.44 rows=1 width=57)
+# Performance Tuning for GET /chores Endpoint
 
-This EXPLAIN means that the cost range of the query is 0.00 to 11740.00, which is rather expensive, and the number of rows that are returned is 50 thousand.
+```
+### Initial Query Analysis
+The GET /chores endpoint retrieves all rows from the chore table, sorted by priority.
+When tested via Swagger UI with no priority filter applied, the endpoint took 7033.46 ms to execute.
+This slow performance indicated the need for optimization. To test further, the query was analyzed using EXPLAIN and EXPLAIN ANALYZE.
 
-This is the scan after creating the index on the priority column.
-Index Scan using idx_chore_id on chore  (cost=0.42..8.44 rows=1 width=57)
-Seq Scan on chore  (cost=0.00..11740.00 rows=100617 width=41)
-  ->  Bitmap Index Scan on idx_priority  (cost=0.00..1099.05 rows=100617 width=0)
+```
+SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
+FROM chore
+ORDER BY priority;
+```
+### Initial EXPLAIN Output:
+### Observations:
+1. Sequential Scan: The query performs a full scan of all 355,000 rows in the chore table, as there was no index on the priority column.
+2. Sorting: The entire result set is sorted in-memory, further increasing the query cost.
 
-This is get chores 1725.57 ms
-get chores = 7544.33 ms 
+### Output:
+```
+-- Sort  (cost=52308.99..53196.49 rows=355000 width=49)
+--   Sort Key: priority
+--   ->  Seq Scan on chore  (cost=0.00..7448.00 rows=355000 width=49)
+```
 
-The get_chores query was really slow at first because it scanned the whole table to get results. Adding an index on the priority column helped a lot by speeding things up with a better scan method. Then, adding a composite index on priority and due_date made it even faster by letting the database filter and sort much more efficiently. These changes cut the time from 8367.33 to 7544.33 ms for the query without any filters on the priority and from 1791.10 to 1725.57 ms for the query with the filter of priority 1.
+### Initial EXPLAIN ANALYZE Output:
+### Observations:
+Execution Time: The query took 249.034 ms in the database, significantly lower than the time measured via Swagger UI. 
+The difference is likely due to application-level overhead, including network latency and JSON serialization.
+Sorting Method: Sorting required 22 MB of disk space, adding to the query's cost.
+
+### Output:
+```
+ Sort  (cost=52308.99..53196.49 rows=355000 width=49) (actual time=204.425..238.510 rows=355004 loops=1)
+   Sort Key: priority
+   Sort Method: external merge  Disk: 22000kB
+   ->  Seq Scan on chore  (cost=0.00..7448.00 rows=355000 width=49) (actual time=0.197..106.692 rows=355004 loops=1)
+ Planning Time: 0.320 ms
+ Execution Time: 249.034 ms
+```
+
+### Adding an Index
+To optimize the query, an index was created on the priority column:
+```
+CREATE INDEX idx_chore_priority ON chore(priority);
+```
+This index enables the database to retrieve rows in the order of priority without requiring a full table scan or external sorting.
+
+### Post-Index EXPLAIN Output:
+### Observations:
+Index Scan: The query now uses the idx_chore_priority index to retrieve rows efficiently, avoiding the need for a sequential scan or additional sorting.
+
+### Output:
+```
+Index Scan using idx_chore_priority on chore  (cost=0.42..21624.55 rows=355004 width=49)
+```
+### Validating Improvements with EXPLAIN ANALYZE
+After adding the index, the query was rerun with EXPLAIN ANALYZE and buffer usage metrics:
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
+FROM chore
+ORDER BY priority;
+
+### Output:
+### Observations:
+Execution Time: The query execution time in the database reduced to 171.010 ms, an improvement from the initial 249.034 ms.
+Buffer Usage: Data was retrieved efficiently from shared memory buffers (shared hit=19791), minimizing disk I/O.
+
+### Output:
+```
+Index Scan using idx_chore_priority on chore  (cost=0.42..21624.55 rows=355004 width=49) (actual time=0.235..158.117 rows=355004 loops=1)
+   Buffers: shared hit=19791
+ Planning Time: 0.649 ms
+ Execution Time: 171.010 ms
+```
+### Observations:
+### While the database query execution time reduced significantly, the endpoint still took 7033.46 ms when tested via Swagger UI.
+This discrepancy highlights application-level overhead as a significant contributor to the total execution time. 
+Factors such as JSON serialization, network latency, and processing large result sets likely contribute to the delay.
+
+### Recommendations for Further Optimization:
+1. Pagination: Introduce pagination to limit the number of rows returned per request, reducing JSON serialization and network latency.
+SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
+FROM chore
+ORDER BY priority
+LIMIT 100 OFFSET 0;
+2. Efficient Serialization: Use faster libraries like orjson for JSON serialization in the application layer.
+3. Asynchronous Processing: Optimize endpoint performance by using asynchronous processing if supported by the framework.
+---
 
 2. get 30 day chore history = 144.72 ms b/c chore due dates are set in the future
 Sort  (cost=0.01..0.02 rows=0 width=84)
