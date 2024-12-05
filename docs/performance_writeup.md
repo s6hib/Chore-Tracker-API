@@ -34,10 +34,10 @@ This data model is set up to handle a realistic roommate tracking service, desig
 3. **Chore Assignments (355,000):**
    - Every chore gets assigned to a specific roommate, so this matches the number of chores.
 
-4. **Bills (26,3650):**
+4. **Bills (26,365):**
    - Bills grow based on monthly expenses like rent, utilities, and shared groceries. The high number here reflects how bills accumulate over months and years. 
 
-5. **Bill List (410,000):**
+5. **Bill List (263,650):**
    - Each bill is split among all 10 roommates that live in the house, so for every bill, there are 10 entries in the bill list.
 
 ---
