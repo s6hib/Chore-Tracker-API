@@ -11,7 +11,7 @@ The service generates the following number of rows for each table:
 | Table                | Number of Rows               | Explanation                                              |
 |----------------------|------------------------------|--------------------------------------------------------|
 | `roommate`           | **10**                       | Represents a fixed number of roommates in a shared living space, such as a co-living house. |
-| `chore`              | **355,000**                | Each roommate is responsible for **500,000 chores**, representing recurring tasks over time (e.g., daily, weekly, monthly chores). |
+| `chore`              | **355,000**                | Each roommate is responsible for **355,000 chores**, representing recurring tasks over time (e.g., daily, weekly, monthly chores). |
 | `chore_assignment`   | **355,000**                | Each chore is assigned to a specific roommate, mirroring the `chore` table. |
 | `bill`               | **26,365**                   | Represents shared expenses such as utilities, rent, and groceries. |
 | `bill_list`          | **263,650**                  | Each bill is shared among all **10 roommates**, leading to **10 entries per bill**. |
@@ -77,7 +77,7 @@ This setup is realistic and scalable because:
 | get_chore                         | 7441.87            |
 ---
 
-1. # Performance Tuning for GET /chores Endpoint
+ # 1. Performance Tuning for GET /chores Endpoint
 
 ### Initial Query Analysis
 The GET /chores endpoint retrieves all rows from the chore table, sorted by priority.
@@ -158,7 +158,7 @@ While the database query execution time reduced significantly, the endpoint stil
 This discrepancy highlights application-level overhead as a significant contributor to the total execution time. 
 Factors such as JSON serialization, network latency, and processing large result sets likely contribute to the delay.
 
-### Recommendations for Further Optimization:
+### For Further Optimization:
 1. Pagination: Introduce pagination to limit the number of rows returned per request, reducing JSON serialization and network latency.
 ```
 SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
@@ -170,7 +170,7 @@ LIMIT 100 OFFSET 0;
 3. Asynchronous Processing: Optimize endpoint performance by using asynchronous processing if supported by the framework.
 ---
 
-2. # Performance Tuning for GET /assignments/{roommate_id} Endpoint
+ # 2. Performance Tuning for GET /assignments/{roommate_id} Endpoint
 
 ### Initial Query Analysis
 The `GET /assignments/{roommate_id}` endpoint retrieves all chore assignments for a specific roommate from the `chore_assignment` table, ordered by `roommate_id`. When tested via Swagger UI with a `roommate_id` parameter, the endpoint took **502.95 ms** to execute. This performance suggested room for improvement. To investigate further, the query was analyzed using `EXPLAIN` and `EXPLAIN ANALYZE`.
@@ -254,7 +254,7 @@ While the database query execution time reduced significantly, the endpoint stil
 This indicates highlights application-level overhead as a significant contributor to the total execution time. 
 Factors such as JSON serialization, network latency, and data processing like converting rows to dictionaries likely contribute to the delay.
 
-### Recommendations for Further Optimization: 
+### For Further Optimization: 
 As similar to what was suggested in the first end point - 
 1. Pagination: Introduce pagination to limit the number of rows returned per request, reducing JSON serialization and network latency.
 ```
@@ -267,7 +267,7 @@ LIMIT 100 OFFSET 0;
 2. Efficient Serialization: Use faster libraries for JSON serialization in the application layer.
 ---
 
-3. # Performance Tuning for GET /30_day_chore_history Endpoint
+ # 3. Performance Tuning for GET /30_day_chore_history Endpoint
 
 ### Initial Query Analysis
 The `GET /30_day_chore_history` endpoint retrieves chore history for the last 30 days, including information about the chore, the assignee, and its completion status. When tested via Swagger UI, the endpoint took **438.82 ms** to execute. This performance indicated room for improvement. To investigate further, the query was analyzed using `EXPLAIN` and `EXPLAIN ANALYZE`.
