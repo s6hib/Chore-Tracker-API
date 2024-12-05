@@ -119,12 +119,12 @@ Index Scan using idx_chore_priority on chore  (cost=0.42..21624.55 rows=355004 w
 ```
 ### Validating Improvements with EXPLAIN ANALYZE
 After adding the index, the query was rerun with EXPLAIN ANALYZE and buffer usage metrics:
-
+```
 EXPLAIN (ANALYZE, BUFFERS)
 SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
 FROM chore
 ORDER BY priority;
-
+```
 ### Output:
 ### Observations:
 Execution Time: The query execution time in the database reduced to 171.010 ms, an improvement from the initial 249.034 ms.
