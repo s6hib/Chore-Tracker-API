@@ -128,7 +128,7 @@ def get_chore_history():
     # calculate date 30 days ago
     start_time = time.time()
     thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
-    
+    print(thirty_days_ago)
     try:
         with db.engine.begin() as connection:
             result = connection.execute(sqlalchemy.text(
