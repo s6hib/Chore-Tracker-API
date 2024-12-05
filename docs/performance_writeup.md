@@ -81,9 +81,9 @@ ORDER BY priority;
 
 ### Output:
 ```
--- Sort  (cost=52308.99..53196.49 rows=355000 width=49)
---   Sort Key: priority
---   ->  Seq Scan on chore  (cost=0.00..7448.00 rows=355000 width=49)
+ Sort  (cost=52308.99..53196.49 rows=355000 width=49)
+   Sort Key: priority
+   ->  Seq Scan on chore  (cost=0.00..7448.00 rows=355000 width=49)
 ```
 
 ### Initial EXPLAIN ANALYZE Output:
@@ -138,17 +138,19 @@ Index Scan using idx_chore_priority on chore  (cost=0.42..21624.55 rows=355004 w
  Execution Time: 171.010 ms
 ```
 ### Observations:
-### While the database query execution time reduced significantly, the endpoint still took 7033.46 ms when tested via Swagger UI.
+While the database query execution time reduced significantly, the endpoint still took 7033.46 ms when tested via Swagger UI.
 This discrepancy highlights application-level overhead as a significant contributor to the total execution time. 
 Factors such as JSON serialization, network latency, and processing large result sets likely contribute to the delay.
 
 ### Recommendations for Further Optimization:
 1. Pagination: Introduce pagination to limit the number of rows returned per request, reducing JSON serialization and network latency.
+```
 SELECT id, name, location_in_house, frequency, duration_mins, priority, due_date
 FROM chore
 ORDER BY priority
 LIMIT 100 OFFSET 0;
-2. Efficient Serialization: Use faster libraries like orjson for JSON serialization in the application layer.
+```
+2. Efficient Serialization: Use faster libraries for JSON serialization in the application layer.
 3. Asynchronous Processing: Optimize endpoint performance by using asynchronous processing if supported by the framework.
 ---
 
