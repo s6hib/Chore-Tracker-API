@@ -64,7 +64,6 @@ This service is designed to scale effectively because:
 
 # Performance Tuning for GET /chores Endpoint
 
-```
 ### Initial Query Analysis
 The GET /chores endpoint retrieves all rows from the chore table, sorted by priority.
 When tested via Swagger UI with no priority filter applied, the endpoint took 7033.46 ms to execute.
