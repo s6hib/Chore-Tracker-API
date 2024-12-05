@@ -399,30 +399,32 @@ Execution Time: 154.077 ms
 ```
 for idx_chore_due_date:
 ```
-Gather Merge  (cost=14676.58..16733.70 rows=17888 width=83) (actual time=147.393..153.170 rows=30275 loops=1)
+Gather Merge  (cost=14277.21..16334.33 rows=17888 width=83) (actual time=191.689..197.845 rows=30275 loops=1)
   Workers Planned: 1
   Workers Launched: 1
-  ->  Sort  (cost=13676.57..13721.29 rows=17888 width=83) (actual time=142.788..143.522 rows=15138 loops=2)
+  ->  Sort  (cost=13277.20..13321.92 rows=17888 width=83) (actual time=186.470..187.424 rows=15138 loops=2)
         Sort Key: c.due_date DESC
-        Sort Method: quicksort  Memory: 1579kB
-        Worker 0:  Sort Method: quicksort  Memory: 1512kB
-        ->  Hash Join  (cost=6612.99..12413.08 rows=17888 width=83) (actual time=92.890..139.346 rows=15138 loops=2)
+        Sort Method: quicksort  Memory: 1567kB
+        Worker 0:  Sort Method: quicksort  Memory: 1524kB
+        ->  Hash Join  (cost=6213.61..12013.70 rows=17888 width=83) (actual time=114.743..181.389 rows=15138 loops=2)
               Hash Cond: (ca.roommate_id = r.id)
-              ->  Parallel Hash Join  (cost=6589.94..12342.73 rows=17888 width=27) (actual time=92.533..137.189 rows=15138 loops=2)
+              ->  Parallel Hash Join  (cost=6190.56..11943.35 rows=17888 width=27) (actual time=114.457..179.051 rows=15138 loops=2)
                     Hash Cond: (ca.chore_id = c.id)
-                    ->  Parallel Seq Scan on chore_assignment ca  (cost=0.00..5569.30 rows=69901 width=20) (actual time=0.020..31.468 rows=59196 loops=2)
+                    ->  Parallel Seq Scan on chore_assignment ca  (cost=0.00..5569.30 rows=69901 width=20) (actual time=0.017..45.911 rows=59196 loops=2)
                           Filter: (status = 'completed'::status_enum)
                           Rows Removed by Filter: 118305
-                    ->  Parallel Hash  (cost=6116.77..6116.77 rows=37853 width=23) (actual time=91.929..91.930 rows=45524 loops=2)
-                          Buckets: 131072  Batches: 1  Memory Usage: 6304kB
-                          ->  Parallel Seq Scan on chore c  (cost=0.00..6116.77 rows=37853 width=23) (actual time=0.068..74.497 rows=45524 loops=2)
-                                Filter: ((due_date >= '2024-11-05'::date) AND (due_date <= '2024-12-05'::date))
-                                Rows Removed by Filter: 131978
-              ->  Hash  (cost=15.80..15.80 rows=580 width=72) (actual time=0.170..0.171 rows=11 loops=2)
+                    ->  Parallel Hash  (cost=5717.40..5717.40 rows=37853 width=23) (actual time=114.095..114.096 rows=45524 loops=2)
+                          Buckets: 131072  Batches: 1  Memory Usage: 6336kB
+                          ->  Parallel Bitmap Heap Scan on chore c  (cost=1251.60..5717.40 rows=37853 width=23) (actual time=2.567..91.294 rows=45524 loops=2)
+                                Recheck Cond: ((due_date >= '2024-11-05'::date) AND (due_date <= '2024-12-05'::date))
+                                Heap Blocks: exact=2117
+                                ->  Bitmap Index Scan on idx_chore_due_date  (cost=0.00..1228.89 rows=90847 width=0) (actual time=4.639..4.639 rows=91049 loops=1)
+                                      Index Cond: ((due_date >= '2024-11-05'::date) AND (due_date <= '2024-12-05'::date))
+              ->  Hash  (cost=15.80..15.80 rows=580 width=72) (actual time=0.059..0.059 rows=11 loops=2)
                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
-                    ->  Seq Scan on roommate r  (cost=0.00..15.80 rows=580 width=72) (actual time=0.153..0.155 rows=11 loops=2)
-Planning Time: 2.717 ms
-Execution Time: 154.077 ms
+                    ->  Seq Scan on roommate r  (cost=0.00..15.80 rows=580 width=72) (actual time=0.046..0.047 rows=11 loops=2)
+Planning Time: 0.791 ms
+Execution Time: 198.794 ms
 ```
 ### Validating Improvements with EXPLAIN ANALYZE
 After adding the index, the query was rerun with EXPLAIN ANALYZE and buffer usage metrics:
