@@ -443,7 +443,6 @@ WHERE ca.status = 'completed'
 ORDER BY c.due_date DESC;
 ```
 ### Observations:
-Observations:
 Execution Time: The query execution time reduced from 438.82 ms to 242.885 ms, showing significant improvement.
 Buffer Usage: The query effectively retrieved data from shared buffers (memory), avoiding disk I/O.
 
